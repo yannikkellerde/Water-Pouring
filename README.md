@@ -1,7 +1,10 @@
 # Fluid flow + Graph networks + Human Water pouring
 
 ## Simulators with code
-* https://github.com/yuanming-hu/taichi_mpm
+* http://taichi.graphics/wp-content/uploads/2019/03/mls-mpm-cpic.pdf - https://github.com/yuanming-hu/taichi_mpm
+
+## Simulators without code
+* https://dl.acm.org/doi/10.1145/2786784.2786796
 
 ## Libarys
 * https://github.com/deepmind/graph_nets
