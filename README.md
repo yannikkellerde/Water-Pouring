@@ -11,6 +11,8 @@
 
 ## Papers without code
 * https://arxiv.org/pdf/2002.09405.pdf
+* https://openreview.net/attachment?id=B1lDoJSYDH&name=original_pdf
+* https://arxiv.org/pdf/1909.05862.pdf
 
 ## Papers with code
 * https://arxiv.org/pdf/2007.04439.pdf - https://github.com/locuslab/cfd-gcn
