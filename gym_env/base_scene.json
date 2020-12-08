@@ -20,7 +20,7 @@
 		"velocityUpdateMethod": 0,
 		"enableDivergenceSolver": true,
 		"enablePartioExport": true,
-        	"enableRigidBodyExport": true,
+        "enableRigidBodyExport": true,
 		"particleAttributes": "velocity",
 		"boundaryHandlingMethod": 2
 	},
