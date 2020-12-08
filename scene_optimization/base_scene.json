@@ -1,0 +1,112 @@
+{
+	"Configuration": 
+	{
+		"stopAt":10,
+		"pause":false,
+		"particleRadius": 0.01,
+		"timeStepSize": 0.005,
+		"numberOfStepsPerRenderUpdate": 1,
+		"density0": 1000, 
+		"simulationMethod": 4,
+		"gravitation": [0,-9.81,0], 
+		"cflMethod": 0, 
+		"cflFactor": 1,
+		"maxIterations": 100,
+		"maxError": 0.05,
+		"maxIterationsV": 100,
+		"maxErrorV": 0.1,		
+		"stiffness": 50000,
+		"exponent": 7,
+		"velocityUpdateMethod": 0,
+		"enableDivergenceSolver": true,
+		"enablePartioExport": true,
+        	"enableRigidBodyExport": true,
+		"particleAttributes": "velocity",
+		"boundaryHandlingMethod": 2
+	},
+	"Materials": [
+		{
+			"id": "fluid",
+			"colorMapType": 1,
+			"surfaceTension": 0.2,
+			"surfaceTensionMethod": 0,
+			"viscosity": 0.01,
+			"viscosityMethod": 1
+		}
+	],
+	"RigidBodies": [
+		{
+			"id": 0,
+			"geometryFile": "../models/UnitBox.obj",
+			"translation": [0,2,0],
+			"rotationAxis": [1, 0, 0],
+			"rotationAngle": 0,
+			"scale": [8, 8, 8],
+			"color": [0.1, 0.4, 0.6, 1.0], 
+			"isDynamic": false,
+			"isWall": true,
+			"mapInvert": true, 
+			"mapThickness": 0.0,
+			"mapResolution": [25,25,25]
+		},
+		{
+			"id": 1,
+			"geometryFile": "../models/small_glas.obj",
+			"translation": [0,0,0],
+			"rotationAxis": [1, 0, 0],
+			"rotationAngle": 0,
+			"scale": [0.8,0.8,0.8],
+			"color": [0.1, 0.4, 0.6, 1.0], 
+			"density": 10000,
+			"isDynamic": false,
+			"isWall": false,
+			"mapInvert": false, 
+			"mapThickness": 0.0,
+			"mapResolution": [20,20,20]
+		},
+		{
+			"id": 2,
+			"geometryFile": "../models/small_bottle.obj",
+			"translation": [-0.1,-0.6,0],
+			"rotationAxis": [1, 0, 0],
+			"rotationAngle": 0,
+			"scale": [1,1,1],
+			"color": [0.1, 0.4, 0.6, 1.0], 
+			"density": 10000,
+			"isDynamic": true,
+			"isWall": false,
+			"mapInvert": false, 
+			"mapThickness": 0.0,
+			"mapResolution": [20,20,20]
+		}
+		
+	],
+	"TargetAngleMotorHingeJoints": [
+		{
+			"bodyID1": 0,
+			"bodyID2": 2,
+			"position": [0.3,0.65,0],
+            "axis": [0,0,-1],
+            "repeatSequence": false,
+	    "targetSequence": [0,0,3,-0.5,3.5,-0.5,5,0]
+		}
+	],
+	"FluidModels": [
+        {
+            "translation": [
+                -0.1,
+                -0.6,
+                0
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "id": "fluid",
+            "particleFile": "../models/middle_fluid.obj"
+        }
+]    
+}
+
+
