@@ -5,6 +5,16 @@ def partio_uncompress(dirname):
         p = partio.read(os.path.join(dirname,f))
         partio.write(os.path.join(dirname,f),p)
 
+def partio_write_rigid_body(vertices,filename):
+    os.makedirs(os.path.dirname(filename),exist_ok=True)
+    particleSet=partio.create()
+    P=particleSet.addAttribute("position",partio.VECTOR,3)
+    id=particleSet.addAttribute("id",partio.INT,1)
+    particleSet.addParticles(len(vertices))
+    for i,vertex in enumerate(vertices):
+        particleSet.set(P,i,[float(x) for x in vertex])
+    partio.write(filename,particleSet)
+
 def evaluate_partio(dirname):
     files = os.listdir(dirname)
     files.sort(key=lambda x:-int(x.split(".")[0].split("_")[-1]))

@@ -1,3 +1,5 @@
 partio/
 __pycache__/
 Cache/
+test/
+.vscode/

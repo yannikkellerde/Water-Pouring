@@ -21,6 +21,7 @@
 		"enableDivergenceSolver": true,
 		"enablePartioExport": true,
         "enableRigidBodyExport": true,
+        "dataExportFPS":25,
 		"particleAttributes": "velocity",
 		"boundaryHandlingMethod": 2
 	},
@@ -38,7 +39,7 @@
 		{
 			"id": 0,
 			"geometryFile": "models/UnitBox.obj",
-			"translation": [0,2,0],
+			"translation": [0,0,0],
 			"rotationAxis": [1, 0, 0],
 			"rotationAngle": 0,
 			"scale": [8, 8, 8],
@@ -52,7 +53,7 @@
 		{
 			"id": 1,
 			"geometryFile": "models/small_glas.obj",
-			"translation": [0,0,0],
+			"translation": [0,-1,0],
 			"rotationAxis": [1, 0, 0],
 			"rotationAngle": 0,
 			"scale": [0.8,0.8,0.8],
@@ -67,9 +68,9 @@
 		{
 			"id": 2,
 			"geometryFile": "models/small_bottle.obj",
-			"translation": [-0.1,-0.6,0],
-			"rotationAxis": [1, 0, 0],
-			"rotationAngle": 0,
+			"translation": [1,0,0],
+			"rotationAxis": [0, 0, 1],
+			"rotationAngle": 1.6,
 			"scale": [1,1,1],
 			"color": [0.1, 0.4, 0.6, 1.0], 
 			"density": 10000,
@@ -84,15 +85,12 @@
 	"FluidModels": [
         {
             "translation": [
-                -0.1,
-                -0.6,
+                1,
+                0,
                 0
             ],
-            "scale": [
-                1,
-                1,
-                1
-            ],
+            "rotationAxis": [0, 0, 1],
+			"rotationAngle": 1.6,
             "id": "fluid",
             "particleFile": "models/middle_fluid.obj"
         }
