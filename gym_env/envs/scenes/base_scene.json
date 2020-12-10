@@ -1,7 +1,7 @@
 {
 	"Configuration": 
 	{
-		"stopAt":10,
+		"stopAt":100,
 		"pause":false,
 		"particleRadius": 0.01,
 		"timeStepSize": 0.005,
@@ -37,22 +37,8 @@
 	],
 	"RigidBodies": [
 		{
-			"id": 0,
-			"geometryFile": "models/UnitBox.obj",
-			"translation": [0,0,0],
-			"rotationAxis": [1, 0, 0],
-			"rotationAngle": 0,
-			"scale": [8, 8, 8],
-			"color": [0.1, 0.4, 0.6, 1.0], 
-			"isDynamic": false,
-			"isWall": true,
-			"mapInvert": true, 
-			"mapThickness": 0.0,
-			"mapResolution": [25,25,25]
-		},
-		{
 			"id": 1,
-			"geometryFile": "models/small_glas.obj",
+			"geometryFile": "../models/small_glas.obj",
 			"translation": [0,-1,0],
 			"rotationAxis": [1, 0, 0],
 			"rotationAngle": 0,
@@ -67,7 +53,7 @@
 		},
 		{
 			"id": 2,
-			"geometryFile": "models/small_bottle.obj",
+			"geometryFile": "../models/small_bottle.obj",
 			"translation": [1,0,0],
 			"rotationAxis": [0, 0, 1],
 			"rotationAngle": 1.6,
@@ -92,7 +78,7 @@
             "rotationAxis": [0, 0, 1],
 			"rotationAngle": 1.6,
             "id": "fluid",
-            "particleFile": "models/middle_fluid.obj"
+            "particleFile": "../models/middle_fluid.obj"
         }
 ]    
 }

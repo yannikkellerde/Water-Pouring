@@ -1,7 +1,8 @@
 import pysplishsplash
 import pysplishsplash.Utilities.SceneLoaderStructs as Scene
+from pysplishsplash.Utilities import VecVector3r
 from pysplishsplash.Extras import Scenes
-from partio_utils import partio_write_rigid_body,partio_uncompress
+from utils.partio_utils import partio_write_rigid_body,partio_uncompress
 import os,sys,time
 import numpy as np
 from scipy.spatial import Delaunay
@@ -14,6 +15,23 @@ def get_functions(obj):
     return [method_name for method_name in dir(obj)
                     if callable(getattr(obj, method_name))]
 
+def in_hull(p, hull):
+    # Source https://stackoverflow.com/a/16898636
+    """
+    Test if points in `p` are in `hull`
+
+    `p` should be a `NxK` coordinates of `N` points in `K` dimensions
+    `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the 
+    coordinates of `M` points in `K`dimensions for which Delaunay triangulation
+    will be computed
+    """
+    return hull.find_simplex(p)>=0
+
+def in_hull_rotated(p, hull, hull_orig_translation, hull_new_translation, hull_new_rotation):
+    new_p = p-hull_orig_translation-hull_new_translation
+    new_p @= hull_new_rotation.T
+    new_p += hull_orig_translation
+    return in_hull(new_p, hull)
 
 def set_axes_equal(ax):
   # Source https://stackoverflow.com/a/31364297
@@ -48,13 +66,9 @@ def set_axes_equal(ax):
 def main():
     base = pysplishsplash.Exec.SimulatorBase()
     sim = pysplishsplash.Simulation()
-    args = base.init(useGui=False,outputDir=os.path.abspath("test"),sceneFile=os.path.abspath("base_scene.json"))
-    #args = base.init(useGui=True,outputDir=os.path.abspath("test"),stateFile=os.path.abspath("state/state.bin"),sceneFile=Scenes.MotorScene)
-    #gui = pysplishsplash.GUI.Simulator_GUI_imgui(base)
-    #base.setGui(gui)
-    #scene = base.getScene()
-    #add_block = Scene.FluidBlock('Fluid', Scene.Box([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]), 0, [0.0, 0.0, 0.0])
-    #scene.fluidBlocks[1] = add_block # In Place construction not supported yet
+    args = base.init(useGui=True,outputDir=os.path.abspath("test"),sceneFile=os.path.abspath("scenes/base_scene.json"))
+    gui = pysplishsplash.GUI.Simulator_GUI_imgui(base)
+    base.setGui(gui)
     base.setValueBool(base.PARTIO_EXPORT, True)
     base.setValueBool(base.RB_EXPORT,True)
     base.setValueBool(base.VTK_EXPORT, True)
@@ -62,8 +76,8 @@ def main():
     base.setValueFloat(base.STOP_AT, 1.0)
     base.initSimulation()
     base.initBoundaryData()
-    #print("HEEEYO",sim.getCurrent().numberOfBoundaryModels())
-    bottle = sim.getCurrent().getBoundaryModel(2).getRigidBodyObject()
+    bottle = sim.getCurrent().getBoundaryModel(1).getRigidBodyObject()
+    #fluid = sim.getCurrent().getFluidModel(0)
     #print(bottle.getPosition(),bottle.getRotation(),bottle.getWorldSpacePosition(),bottle.getWorldSpaceRotation(),sep="\n")
     rotation_matrix = np.array([[0.9999999, -0.0005236,  0.0000000],
                                 [0.0005236,  0.9999999,  0.0000000],
@@ -72,6 +86,27 @@ def main():
     rigid_body_name = "test/partio_rigid/rigid_{}.bgeo"
     geo = bottle.getGeometry()
     verts = np.array(geo.getVertices())
+    faces = np.array(geo.getFaces())
+    sfaces = faces.copy()
+    np.random.shuffle(sfaces)
+    geo.setFaces(sfaces)
+    maces = np.array(geo.getFaces())
+
+    bottle_hull = Delaunay(verts)
+    """
+    fluid_positions = fluid.getAllPositions()[:fluid.numActiveParticles()]
+
+
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.scatter(*zip(*fluid_positions),s=0.1)
+    set_axes_equal(ax)
+    plt.show()
+
+    inbottle = in_hull(fluid_positions,bottle_hull)
+    print(np.sum(inbottle),np.sum(~inbottle),len(fluid_positions))
+    print(fluid_positions[-1],fluid_positions[0])"""
+
     partio_write_rigid_body(verts,rigid_body_name.format(1))
     cur_rot = rotation_matrix
     bottle_rot_orig = np.array(bottle.getRotation())
@@ -80,13 +115,20 @@ def main():
         new_rot = bottle_rot_orig@cur_rot
         bottle.setRotation(new_rot)
         bottle.setWorldSpaceRotation(new_rot)
-        #geo.rotateVertices(rotation_matrix)
-        #geo.updateNormals()
-        #geo.updateVertexNormals()
-        if i%8==0:
-            verts_now = ((verts-bottle_translation) @ cur_rot.T)+bottle_translation
+        np.random.shuffle(faces)
+        geo.setFaces(faces)
+        verts_now = ((verts-bottle_translation) @ cur_rot.T)+bottle_translation
+        geo.setVertices(VecVector3r(verts_now))
+        geo.updateNormals()
+        geo.updateVertexNormals()
+        
+        base.updateVMVelocity()
+        if i%8==-1:
             partio_write_rigid_body(verts_now,rigid_body_name.format(int(i/8+2)))
         base.timeStepNoGUI()
+        gui.update()
+        gui.render()
+        gui.one_render()
         cur_rot = cur_rot@rotation_matrix
 
     partio_uncompress("test/partio")
