@@ -76,21 +76,24 @@ def main():
     base.setValueFloat(base.STOP_AT, 1.0)
     base.initSimulation()
     base.initBoundaryData()
+    print("\n\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n")
     bottle = sim.getCurrent().getBoundaryModel(1).getRigidBodyObject()
     #fluid = sim.getCurrent().getFluidModel(0)
     #print(bottle.getPosition(),bottle.getRotation(),bottle.getWorldSpacePosition(),bottle.getWorldSpaceRotation(),sep="\n")
     rotation_matrix = np.array([[0.9999999, -0.0005236,  0.0000000],
                                 [0.0005236,  0.9999999,  0.0000000],
                                 [0.0000000,  0.0000000,  1.0000000]])
+    eight_rotations = reduce(lambda x, y:x@y, (rotation_matrix for _ in range(8)))
     #print("HEEEEELLOOOO",geo.numVertices())
     rigid_body_name = "test/partio_rigid/rigid_{}.bgeo"
     geo = bottle.getGeometry()
+    print("Heeelooo",geo,bottle.getGeometry())
     verts = np.array(geo.getVertices())
-    faces = np.array(geo.getFaces())
-    sfaces = faces.copy()
-    np.random.shuffle(sfaces)
-    geo.setFaces(sfaces)
-    maces = np.array(geo.getFaces())
+    #faces = np.array(geo.getFaces())
+    #sfaces = faces.copy()
+    ##np.random.shuffle(sfaces)
+    #geo.setFaces(sfaces)
+    #maces = np.array(geo.getFaces())
 
     bottle_hull = Delaunay(verts)
     """
@@ -106,29 +109,35 @@ def main():
     inbottle = in_hull(fluid_positions,bottle_hull)
     print(np.sum(inbottle),np.sum(~inbottle),len(fluid_positions))
     print(fluid_positions[-1],fluid_positions[0])"""
-
     partio_write_rigid_body(verts,rigid_body_name.format(1))
     cur_rot = rotation_matrix
     bottle_rot_orig = np.array(bottle.getRotation())
     bottle_translation = np.array(bottle.getPosition())
     for i in trange(2000):
+        #print(geo,bottle.getGeometry())
         new_rot = bottle_rot_orig@cur_rot
         bottle.setRotation(new_rot)
         bottle.setWorldSpaceRotation(new_rot)
-        np.random.shuffle(faces)
-        geo.setFaces(faces)
-        verts_now = ((verts-bottle_translation) @ cur_rot.T)+bottle_translation
-        geo.setVertices(VecVector3r(verts_now))
-        geo.updateNormals()
-        geo.updateVertexNormals()
+        #np.random.shuffle(faces)
+        #geo.setFaces(faces)
         
-        base.updateVMVelocity()
-        if i%8==-1:
-            partio_write_rigid_body(verts_now,rigid_body_name.format(int(i/8+2)))
+        #base.updateVMVelocity()
+        #if i%8==-1:
+        #    partio_write_rigid_body(verts_now,rigid_body_name.format(int(i/8+2)))
+        #base.timeStepNoGUI()
+        #gui.render()
+        #if i>200:
+        #    
+        #else:
+        #verts_now = ((verts-bottle_translation) @ cur_rot.T)+bottle_translation
+        #bottle.getGeometry().setVertices(VecVector3r(verts_now))
+        bottle.updateVertices()
+        bottle.getGeometry().updateNormals()
+        bottle.getGeometry().updateVertexNormals()
         base.timeStepNoGUI()
-        gui.update()
-        gui.render()
         gui.one_render()
+        #print(bottle.getGeometry())
+        #print(np.array(bottle.getGeometry().getVertices())[0])
         cur_rot = cur_rot@rotation_matrix
 
     partio_uncompress("test/partio")
