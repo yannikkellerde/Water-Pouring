@@ -1,58 +1,58 @@
-[2020-12-11 18:34:00] Info:    SPlisHSPlasH version: 2.8.8
-[2020-12-11 18:34:00] Debug:   Git refspec:          refs/heads/master
-[2020-12-11 18:34:00] Debug:   Git SHA1:             5913fdd263af2361f529e8aa661c06c83bae13bf
-[2020-12-11 18:34:00] Debug:   Git status:           DIRTY
-[2020-12-11 18:34:00] Debug:   Host name:            kappablanca-desktop
-[2020-12-11 18:34:00] Info:    Output directory: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/particles
-[2020-12-11 18:34:00] Info:    Load scene file: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/scenes/base_scene.json
-[2020-12-11 18:34:00] Info:    Initialize static boundary simulation
-[2020-12-11 18:34:00] Info:    Initialize fluid particles
-[2020-12-11 18:34:00] Info:    Number of fluid particles: 389
-[2020-12-11 18:34:00] Info:    OpenGL version 4.6
-[2020-12-11 18:34:00] Info:    Vendor: NVIDIA Corporation
-[2020-12-11 18:34:00] Info:    Renderer: GeForce GTX 1070 Ti/PCIe/SSE2
-[2020-12-11 18:34:00] Info:    Version: 4.6.0 NVIDIA 455.45.01
-[2020-12-11 18:34:00] Info:    ---------------------------------------------------------------------------
+[2020-12-12 12:11:20] Info:    SPlisHSPlasH version: 2.8.8
+[2020-12-12 12:11:20] Debug:   Git refspec:          refs/heads/master
+[2020-12-12 12:11:20] Debug:   Git SHA1:             39508c3fbc92f4e393416de07244cd4e10574412
+[2020-12-12 12:11:20] Debug:   Git status:           DIRTY
+[2020-12-12 12:11:20] Debug:   Host name:            kappablanca-desktop
+[2020-12-12 12:11:20] Info:    Output directory: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/particles
+[2020-12-12 12:11:20] Info:    Load scene file: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/scenes/simple_scene.json
+[2020-12-12 12:11:20] Info:    Initialize static boundary simulation
+[2020-12-12 12:11:20] Info:    Initialize fluid particles
+[2020-12-12 12:11:20] Info:    Number of fluid particles: 445
+[2020-12-12 12:11:20] Info:    OpenGL version 4.6
+[2020-12-12 12:11:20] Info:    Vendor: NVIDIA Corporation
+[2020-12-12 12:11:20] Info:    Renderer: GeForce GTX 1070 Ti/PCIe/SSE2
+[2020-12-12 12:11:20] Info:    Version: 4.6.0 NVIDIA 455.45.01
+[2020-12-12 12:11:20] Info:    ---------------------------------------------------------------------------
 
-[2020-12-11 18:34:00] Info:    ---------------------------------------------------------------------------
+[2020-12-12 12:11:20] Info:    ---------------------------------------------------------------------------
 
-[2020-12-11 18:34:00] Info:    Loading /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/models/bigger/glas.obj
-[2020-12-11 18:34:00] Info:    Number of triangles: 3328
-[2020-12-11 18:34:00] Info:    Number of vertices: 3330
-[2020-12-11 18:34:00] Info:    Loaded cached volume map: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/scenes/Cache/glas_sb_vm_0.05_s0.8_0.8_0.8_r20_20_20_i0_t0.cdm
-[2020-12-11 18:34:00] Info:    Loading /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/models/bigger/bottle.obj
-[2020-12-11 18:34:00] Info:    Number of triangles: 1520
-[2020-12-11 18:34:00] Info:    Number of vertices: 1586
-[2020-12-11 18:34:00] Info:    Loaded cached volume map: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/scenes/Cache/bottle_sb_vm_0.05_s1_1_1_r20_20_20_i0_t0.cdm
-[2020-12-11 18:34:37] Info:    Average time: SimStep: 1.48205 ms
-[2020-12-11 18:34:37] Info:    Average time: animateParticles: 0.00105386 ms
-[2020-12-11 18:34:37] Info:    Average time: emitParticles: 0.00103535 ms
-[2020-12-11 18:34:37] Info:    Average time: pressureSolve: 0.174338 ms
-[2020-12-11 18:34:37] Info:    Average time: computeVolumeAndBoundaryX: 0.0849431 ms
-[2020-12-11 18:34:37] Info:    Average time: neighborhood_search: 0.928198 ms
-[2020-12-11 18:34:37] Info:    Average time: computeDFSPHFactor: 0.016582 ms
-[2020-12-11 18:34:37] Info:    Average time: divergenceSolve: 0.0893799 ms
-[2020-12-11 18:34:37] Info:    Average time: computeNonPressureForces: 0.0256011 ms
-[2020-12-11 18:34:37] Info:    ---------------------------------------------------------------------------
+[2020-12-12 12:11:20] Info:    Loading /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/models/bigger/glas.obj
+[2020-12-12 12:11:20] Info:    Number of triangles: 3328
+[2020-12-12 12:11:20] Info:    Number of vertices: 3330
+[2020-12-12 12:11:20] Info:    Loaded cached volume map: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/scenes/Cache/glas_sb_vm_0.06_s0.8_0.8_0.8_r20_20_20_i0_t-0.07.cdm
+[2020-12-12 12:11:20] Info:    Loading /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/models/bigger/bottle.obj
+[2020-12-12 12:11:20] Info:    Number of triangles: 1308
+[2020-12-12 12:11:20] Info:    Number of vertices: 1390
+[2020-12-12 12:11:20] Info:    Loaded cached volume map: /hdd/home/kappablanca/bachelorthesis/bachelorthesis/water-pouring/water_pouring/envs/scenes/Cache/bottle_sb_vm_0.06_s1_1_1_r20_20_20_i0_t-0.01.cdm
+[2020-12-12 12:11:35] Info:    Average time: SimStep: 1.49619 ms
+[2020-12-12 12:11:35] Info:    Average time: animateParticles: 0.0010338 ms
+[2020-12-12 12:11:35] Info:    Average time: emitParticles: 0.00107663 ms
+[2020-12-12 12:11:35] Info:    Average time: pressureSolve: 0.119335 ms
+[2020-12-12 12:11:35] Info:    Average time: computeVolumeAndBoundaryX: 0.0697903 ms
+[2020-12-12 12:11:35] Info:    Average time: neighborhood_search: 1.11441 ms
+[2020-12-12 12:11:35] Info:    Average time: computeDFSPHFactor: 0.00992463 ms
+[2020-12-12 12:11:35] Info:    Average time: divergenceSolve: 0.0713417 ms
+[2020-12-12 12:11:35] Info:    Average time: computeNonPressureForces: 0.0224122 ms
+[2020-12-12 12:11:35] Info:    ---------------------------------------------------------------------------
 
-[2020-12-11 18:34:37] Info:    Time sum: SimStep: 14820.5 ms
-[2020-12-11 18:34:37] Info:    Time sum: animateParticles: 10.5386 ms
-[2020-12-11 18:34:37] Info:    Time sum: emitParticles: 10.3535 ms
-[2020-12-11 18:34:37] Info:    Time sum: pressureSolve: 1743.38 ms
-[2020-12-11 18:34:37] Info:    Time sum: computeVolumeAndBoundaryX: 849.431 ms
-[2020-12-11 18:34:37] Info:    Time sum: neighborhood_search: 9281.98 ms
-[2020-12-11 18:34:37] Info:    Time sum: computeDFSPHFactor: 165.82 ms
-[2020-12-11 18:34:37] Info:    Time sum: divergenceSolve: 893.799 ms
-[2020-12-11 18:34:37] Info:    Time sum: computeNonPressureForces: 256.011 ms
-[2020-12-11 18:34:37] Info:    ---------------------------------------------------------------------------
+[2020-12-12 12:11:35] Info:    Time sum: SimStep: 10075.3 ms
+[2020-12-12 12:11:35] Info:    Time sum: animateParticles: 6.96162 ms
+[2020-12-12 12:11:35] Info:    Time sum: emitParticles: 7.25003 ms
+[2020-12-12 12:11:35] Info:    Time sum: pressureSolve: 803.6 ms
+[2020-12-12 12:11:35] Info:    Time sum: computeVolumeAndBoundaryX: 469.968 ms
+[2020-12-12 12:11:35] Info:    Time sum: neighborhood_search: 7504.44 ms
+[2020-12-12 12:11:35] Info:    Time sum: computeDFSPHFactor: 66.8324 ms
+[2020-12-12 12:11:35] Info:    Time sum: divergenceSolve: 480.415 ms
+[2020-12-12 12:11:35] Info:    Time sum: computeNonPressureForces: 150.924 ms
+[2020-12-12 12:11:35] Info:    ---------------------------------------------------------------------------
 
-[2020-12-11 18:34:37] Info:    Average number: Time step size: 0.00500015
-[2020-12-11 18:34:37] Info:    Average number: DFSPH - iterationsV: 1.0001
-[2020-12-11 18:34:37] Info:    Average number: DFSPH - iterations: 3.0326
-[2020-12-11 18:34:37] Info:    ---------------------------------------------------------------------------
+[2020-12-12 12:11:35] Info:    Average number: Time step size: 0.0049997
+[2020-12-12 12:11:35] Info:    Average number: DFSPH - iterationsV: 1.00015
+[2020-12-12 12:11:35] Info:    Average number: DFSPH - iterations: 2.4801
+[2020-12-12 12:11:35] Info:    ---------------------------------------------------------------------------
 
-[2020-12-11 18:34:37] Info:    Total number: Time step size: 50.0015
-[2020-12-11 18:34:37] Info:    Total number: DFSPH - iterationsV: 10001
-[2020-12-11 18:34:37] Info:    Total number: DFSPH - iterations: 30326
-[2020-12-11 18:34:37] Info:    ---------------------------------------------------------------------------
+[2020-12-12 12:11:35] Info:    Total number: Time step size: 33.668
+[2020-12-12 12:11:35] Info:    Total number: DFSPH - iterationsV: 6735
+[2020-12-12 12:11:35] Info:    Total number: DFSPH - iterations: 16701
+[2020-12-12 12:11:35] Info:    ---------------------------------------------------------------------------
 

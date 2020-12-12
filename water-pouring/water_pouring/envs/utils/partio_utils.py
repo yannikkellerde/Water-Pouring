@@ -1,7 +1,10 @@
 import partio,sys,os
+import numpy as np
 
 def partio_uncompress(dirname):
     for f in os.listdir(dirname):
+        if not f.endswith(".bgeo"):
+            continue
         p = partio.read(os.path.join(dirname,f))
         partio.write(os.path.join(dirname,f),p)
 
@@ -14,6 +17,23 @@ def partio_write_rigid_body(vertices,filename):
     for i,vertex in enumerate(vertices):
         particleSet.set(P,i,[float(x) for x in vertex])
     partio.write(filename,particleSet)
+
+def remove_particles(infile,outfile,keep_rate):
+    particles = partio.read(infile)
+    orig_attr = particles.attributeInfo("position")
+    orig_num_p = particles.numParticles()
+    all_indices = np.arange(orig_num_p)
+    keep_indices = np.random.choice(all_indices,size=int(orig_num_p*keep_rate),replace=False)
+
+    new_particles = partio.create()
+    P=new_particles.addAttribute("position",partio.VECTOR,3)
+    id=new_particles.addAttribute("id",partio.INT,1)
+    new_particles.addParticles(len(keep_indices))
+    for index,i in enumerate(keep_indices):
+        pos = particles.get(orig_attr,i)
+        new_particles.set(P,index,pos)
+    partio.write(outfile,new_particles)
+
 
 def evaluate_partio(dirname):
     files = os.listdir(dirname)

@@ -54,7 +54,7 @@
 		{
 			"id": 2,
 			"geometryFile": "../models/bigger/bottle.obj",
-			"translation": [1,1,0],
+			"translation": [0.4,1,0],
 			"rotationAxis": [0, 0, 1],
 			"rotationAngle": 1.3,
 			"scale": [1,1,1],
@@ -70,10 +70,9 @@
 	],
 	"FluidModels": [
         {
+            "translation": [-0.6,0,0],
             "id": "fluid",
             "particleFile": "../models/bigger/tmp_fluid.bgeo"
         }
     ]    
 }
-
-

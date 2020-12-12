@@ -1,12 +1,17 @@
 from gym.envs.registration import register
 
 register(
-    id='Pouring-Nondeterministic-v0',
-    entry_point='water_pouring.envs:Pouring_nondeterministic',
+    id='Pouring-Uncertain-v0',
+    entry_point='water_pouring.envs:Pouring_uncertain',
     nondeterministic = True
 )
 register(
-    id='Pouring-Deterministic-v0',
-    entry_point='water_pouring.envs:Pouring_deterministic',
-    nondeterministic = False
+    id='Pouring-Base-v0',
+    entry_point='water_pouring.envs:Pouring_base',
+    nondeterministic = True
+)
+register(
+    id='Pouring-Simple-v0',
+    entry_point='water_pouring.envs:Pouring_simple',
+    nondeterministic = True
 )
