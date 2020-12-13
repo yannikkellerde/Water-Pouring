@@ -1,3 +1,2 @@
 from water_pouring.envs.pouring_base import Pouring_base
-from water_pouring.envs.pouring_uncertain import Pouring_uncertain
 from water_pouring.envs.pouring_simple import Pouring_simple

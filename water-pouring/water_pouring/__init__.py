@@ -1,11 +1,6 @@
 from gym.envs.registration import register
 
 register(
-    id='Pouring-Uncertain-v0',
-    entry_point='water_pouring.envs:Pouring_uncertain',
-    nondeterministic = True
-)
-register(
     id='Pouring-Base-v0',
     entry_point='water_pouring.envs:Pouring_base',
     nondeterministic = True

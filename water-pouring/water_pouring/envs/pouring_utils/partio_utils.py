@@ -34,6 +34,8 @@ def remove_particles(infile,outfile,keep_rate):
         new_particles.set(P,index,pos)
     partio.write(outfile,new_particles)
 
+def count_particles(filename):
+    return partio.read(filename).numParticles()
 
 def evaluate_partio(dirname):
     files = os.listdir(dirname)
