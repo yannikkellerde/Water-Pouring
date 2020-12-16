@@ -23,7 +23,7 @@ class Pouring_base(gym.Env):
         self.use_gui = use_gui
         self.scene_file = scene_file
 
-        self.action_space = spaces.Box(low=0,high=1,shape=(4,))
+        self.action_space = spaces.Box(low=-1,high=1,shape=(4,))
         self.observation_space = spaces.Box(low=0,high=1,shape=(7,))
 
         # Hyperparameters
@@ -33,8 +33,8 @@ class Pouring_base(gym.Env):
         self.translation_bounds = ((-2,2),(-2,2))
         self.proposal_function_rate = 0.05
         self.max_rotation_radians = 0.003
-        self.max_translation_x = 0.006
-        self.max_translation_y = 0.006
+        self.max_translation_x = 0.003
+        self.max_translation_y = 0.003
         self.max_combined_power = 0.01
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
         self.human_saccade_time = 0.1
@@ -125,7 +125,7 @@ class Pouring_base(gym.Env):
 
     def _get_reward(self):
         def score_locations(locations):
-            return locations["glas"]-locations["spilled"]*10
+            return locations["glas"]-locations["spilled"]*17
         new_locations = self._get_particle_locations()
         score = score_locations(new_locations)-score_locations(self.particle_locations)
         self.particle_locations = new_locations
@@ -184,15 +184,15 @@ class Pouring_base(gym.Env):
         if len(action)!=4:
             raise ValueError(f"Invalid action {action}")
         for i,a in enumerate(action):
-            if a<0:
+            if a<-1:
                 punish -= a
-                action[i] = 0
+                action[i] = -1
             elif a>1:
                 punish += a-1
                 action[i] = 1
         self._step_number += 1
-        rot_radians = (-action[0]+0.5)*2*self.max_rotation_radians
-        to_translate = self.base_translation_vector*((np.array([action[1],action[2],0])-0.5)*2)
+        rot_radians = -action[0]*self.max_rotation_radians
+        to_translate = self.base_translation_vector*np.array([action[1],action[2],0])
         mysum = abs(rot_radians)+np.sum(np.abs(to_translate))
         if mysum!=0:
             power_rate = self.max_combined_power/mysum
@@ -219,7 +219,7 @@ class Pouring_base(gym.Env):
         old_particle_locations = self.particle_locations
         reward = self._get_reward()-punish
         if self.fixation in (0,1):
-            self.fixation_direction = -1 if action[3] < 0.5 else 1
+            self.fixation_direction = action[3]
         old_fix = self.fixation
         self.fixation += self.fixation_direction*self.fix_step
         self.fixation = 0 if self.fixation<0 else (1 if self.fixation>1 else self.fixation)

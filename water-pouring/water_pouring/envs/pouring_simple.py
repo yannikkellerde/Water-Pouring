@@ -8,7 +8,7 @@ FILE_PATH = os.path.abspath(os.path.dirname(__file__))
 class Pouring_simple(Pouring_base):
     def __init__(self,use_gui=False,uncertainty=0):
         super(Pouring_simple, self).__init__(use_gui=use_gui,uncertainty=uncertainty,scene_file=os.path.join(FILE_PATH,"scenes","simple_scene.json"))
-        self.action_space = spaces.Box(low=0,high=1,shape=(2,))
+        self.action_space = spaces.Box(low=-1,high=1,shape=(2,))
         self.observation_space = spaces.Box(low=0,high=1,shape=(5,))
     def step(self,action):
         return super(Pouring_simple,self).step((action[0],0.5,0.5,action[1]))

@@ -4,23 +4,23 @@ import numpy as np
 import os
 
 def hard_mode():
-    env = gym.make("water_pouring:Pouring-Base-v0",use_gui=True,uncertainty=0.02)
+    env = gym.make("water_pouring:Pouring-no-fix-v0",use_gui=True,uncertainty=0)
 
     for i in range(4000):
         x,y,r = env.gui.get_bottle_x(),env.gui.get_bottle_y(),env.gui.get_bottle_rotation()
-        observation,reward,done,info = env.step((r/2+0.5,x/2+0.5,y/2+0.5,1))
-        print(info)
+        observation,reward,done,info = env.step((r,x,y))
+        print(observation)
         env.render()
         if done:
             env.reset()
 
 def simple_mode():
-    env = gym.make("water_pouring:Pouring-no-fix-v0",use_gui=True)
+    env = gym.make("water_pouring:Pouring-simple-no-fix-v0",use_gui=True)
     
     full_rew = 0
     for i in range(4000):
         r = env.gui.get_bottle_rotation()
-        obs,rew,done,info = env.step([r/2+0.5])
+        obs,rew,done,info = env.step([r])
         full_rew += rew
         env.render()
         if done:
@@ -48,4 +48,4 @@ def test():
     print("FULL REW 2:",full_rew)
 
 if __name__ == "__main__":
-    test()
+    hard_mode()
