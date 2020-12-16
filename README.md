@@ -1,5 +1,12 @@
 # Fluid flow + Graph networks + Human Water pouring
 
+## Partially observable Monte-Carlo planning algorithm (POMCP)
+D. Silver and J. Veness. Monte-carlo planning in large pomdps. In J. D. Lafferty, C. K. I. Williams, J. Shawe-Taylor,
+R. S. Zemel, and A. Culotta, editors, Advances in Neural Information Processing Systems 23, pages 2164–2172.
+Curran Associates, Inc., 2010.
+
+
+
 ## Simulators with code
 * http://taichi.graphics/wp-content/uploads/2019/03/mls-mpm-cpic.pdf - https://github.com/yuanming-hu/taichi_mpm
 
