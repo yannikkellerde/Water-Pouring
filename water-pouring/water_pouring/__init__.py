@@ -10,3 +10,8 @@ register(
     entry_point='water_pouring.envs:Pouring_simple',
     nondeterministic = True
 )
+register(
+    id='Pouring-no-fix-v0',
+    entry_point='water_pouring.envs:Pouring_no_fix',
+    nondeterministic = True
+)

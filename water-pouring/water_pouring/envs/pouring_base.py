@@ -1,4 +1,5 @@
 import gym
+import psutil
 from gym import spaces
 import pysplishsplash
 import os,sys
@@ -31,7 +32,7 @@ class Pouring_base(gym.Env):
         self.fluid_base_path = os.path.join(FILE_PATH,"models/bigger/fluid.bgeo")
         self.translation_bounds = ((-2,2),(-2,2))
         self.proposal_function_rate = 0.05
-        self.max_rotation_radians = 0.004
+        self.max_rotation_radians = 0.003
         self.max_translation_x = 0.006
         self.max_translation_y = 0.006
         self.max_combined_power = 0.01
@@ -45,6 +46,7 @@ class Pouring_base(gym.Env):
         self.max_water_flow = 4
         self.fix_step = (self.time_step_size/self.human_saccade_time)*self.steps_per_action
 
+        self.gui = None
         self.reset(first=True)
 
     def seed(self,seed):
@@ -63,23 +65,24 @@ class Pouring_base(gym.Env):
                     proposal_accepted = True
             self.current_walk[key] = proposal
 
-    def reset(self,first=False):
+    def reset(self,first=False,use_gui=None):
         if self.uncertainty == 0:
             remove_particles(self.fluid_base_path,os.path.join(FILE_PATH,"models/bigger/tmp_fluid.bgeo"),1)
         else:
             remove_particles(self.fluid_base_path,os.path.join(FILE_PATH,"models/bigger/tmp_fluid.bgeo"),0.5+random.random()/2)
-        
         if not first:
             self.base.cleanup()
+        if self.gui is not None:
+            self.gui.die()
+        self.gui = None
+        if use_gui is not None:
+            self.use_gui = use_gui
         self.base = pysplishsplash.Exec.SimulatorBase()
         self.base.init(useGui=self.use_gui,outputDir=os.path.join(FILE_PATH,"particles"),sceneFile=self.scene_file)
-
-        self.gui = None
         if self.use_gui:
             if self.gui is None:
                 self.gui = pysplishsplash.GUI.Simulator_GUI_imgui(self.base)
-            else:
-                self.gui.die()
+        if self.use_gui:
             self.base.setGui(self.gui)
         self.sim = pysplishsplash.Simulation()
         self.base.initSimulation()
@@ -92,7 +95,7 @@ class Pouring_base(gym.Env):
 
         self.particle_locations = self._get_particle_locations()
 
-        self.fill_observations = deque(maxlen=self.max_observation_store)
+        self.fill_observation = 0
         self.water_flow_observations = deque(maxlen=self.max_observation_store)
         self.fixation = 0
         self.fixation_direction = 0
@@ -116,11 +119,13 @@ class Pouring_base(gym.Env):
             }
         self.time = 0
         self._step_number = 0
+        proc = psutil.Process()
+        print("Did reset, open files:",len(proc.open_files()))
         return self._observe()
 
     def _get_reward(self):
         def score_locations(locations):
-            return locations["glas"]-locations["spilled"]*5
+            return locations["glas"]-locations["spilled"]*10
         new_locations = self._get_particle_locations()
         score = score_locations(new_locations)-score_locations(self.particle_locations)
         self.particle_locations = new_locations
@@ -219,9 +224,7 @@ class Pouring_base(gym.Env):
         self.fixation += self.fixation_direction*self.fix_step
         self.fixation = 0 if self.fixation<0 else (1 if self.fixation>1 else self.fixation)
         if self.fixation == 0:
-            if old_fix!=0:
-                self.fill_observations.clear()
-            self.fill_observations.append(self.particle_locations["glas"])
+            self.fill_observation = self.particle_locations["glas"]
         elif self.fixation == 1:
             if old_fix!=1:
                 self.water_flow_observations.clear()
@@ -263,7 +266,7 @@ class Pouring_base(gym.Env):
         rotation = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
         translation_x,translation_y = self.bottle.translation[:2]
         water_flow_estimate = np.mean(self.water_flow_observations) if len(self.water_flow_observations)>0 else 0
-        fill_state = np.mean(self.fill_observations) if len(self.fill_observations)>0 else 0
+        fill_state = self.fill_observation
         in_bottle = self.particle_locations["bottle"]
         return self._normalize_observation(rotation,translation_x,translation_y,self.fixation,in_bottle,fill_state,water_flow_estimate)
 

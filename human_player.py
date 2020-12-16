@@ -2,7 +2,6 @@ import gym
 from time import perf_counter
 import numpy as np
 import os
-import psutil
 
 def hard_mode():
     env = gym.make("water_pouring:Pouring-Base-v0",use_gui=True,uncertainty=0.02)
@@ -16,31 +15,37 @@ def hard_mode():
             env.reset()
 
 def simple_mode():
-    env = gym.make("water_pouring:Pouring-Simple-v0",use_gui=True)
-
+    env = gym.make("water_pouring:Pouring-no-fix-v0",use_gui=True)
+    
+    full_rew = 0
     for i in range(4000):
         r = env.gui.get_bottle_rotation()
-        print(env.step((r/2+0.5,1)))
+        obs,rew,done,info = env.step([r/2+0.5])
+        full_rew += rew
         env.render()
-
-def check_if_leaking_memory():
-    def check_memory():
-        process = psutil.Process(os.getpid())
-        return process.memory_percent()
-
-    env = gym.make("water_pouring:Pouring-Simple-v0",use_gui=False)
-    wuff = 0
-    while 1:
-        action = env.action_space.sample()
-        obs,rew,done,_ = env.step(action)
         if done:
+            print("\n\nYEEEEEEEEEEEEEEEEEEEEEEEEEEHAA\n",full_rew,"\n\n########################")
             env.reset()
-            wuff += 1
-            if wuff%10==1:
-                print(check_memory())
+            full_rew = 0
 
-
-
+def test():
+    env = gym.make("water_pouring:Pouring-no-fix-v0",use_gui=False)
+    full_rew = 0
+    done = False
+    while not done:
+        obs,rew,done,info = env.step([0])
+        full_rew += rew
+    print("FULL REW 1:",full_rew)
+    #env.base.cleanup()
+    #env = gym.make("water_pouring:Pouring-no-fix-v0",use_gui=True)
+    env.reset(use_gui=True)
+    full_rew = 0
+    done = False
+    while not done:
+        obs,rew,done,info = env.step([0])
+        env.render()
+        full_rew += rew
+    print("FULL REW 2:",full_rew)
 
 if __name__ == "__main__":
-    check_if_leaking_memory()
+    test()
