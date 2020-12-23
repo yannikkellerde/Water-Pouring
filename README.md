@@ -1,11 +1,14 @@
 # Fluid flow + Graph networks + Human Water pouring
 
-## Partially observable Monte-Carlo planning algorithm (POMCP)
+## Solving POMDPs
+### LSTM approach
+DRQN (discrete action space) https://arxiv.org/pdf/1507.06527.pdf
+RDPG (continuous action space) https://arxiv.org/pdf/1710.02896.pdf, https://arxiv.org/pdf/1512.04455.pdf
+TU master thesis https://www.ias.informatik.tu-darmstadt.de/uploads/Team/JoniPajarinen/master_thesis_hong_linh_thai_2018.pdf
+### Partially observable Monte-Carlo planning algorithm (POMCP)
 D. Silver and J. Veness. Monte-carlo planning in large pomdps. In J. D. Lafferty, C. K. I. Williams, J. Shawe-Taylor,
 R. S. Zemel, and A. Culotta, editors, Advances in Neural Information Processing Systems 23, pages 2164–2172.
 Curran Associates, Inc., 2010.
-
-
 
 ## Simulators with code
 * http://taichi.graphics/wp-content/uploads/2019/03/mls-mpm-cpic.pdf - https://github.com/yuanming-hu/taichi_mpm
