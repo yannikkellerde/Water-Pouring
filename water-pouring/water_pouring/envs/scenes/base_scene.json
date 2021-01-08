@@ -5,7 +5,7 @@
 		"pause":false,
 		"particleRadius": 0.06,
         "timeStepSize": 0.005,
-        "cameraPosition":[0,10,10],
+        "cameraPosition":[0,0,0],
 		"numberOfStepsPerRenderUpdate": 1,
 		"density0": 1000, 
 		"simulationMethod": 4,
@@ -20,7 +20,7 @@
 		"exponent": 7,
 		"velocityUpdateMethod": 0,
         "enableDivergenceSolver": true,
-        "enablePartioExport":false,
+        "enablePartioExport":true,
         "dataExportFPS":25,
 		"particleAttributes": "velocity",
 		"boundaryHandlingMethod": 2
@@ -70,7 +70,6 @@
 	],
 	"FluidModels": [
         {
-            "translation": [-0.5,0.5,0],
             "id": "fluid",
             "particleFile": "../models/bigger/tmp_fluid.bgeo"
         }
