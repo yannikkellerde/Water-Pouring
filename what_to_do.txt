@@ -2,4 +2,4 @@ reibung verringern, mit aktueller policy starten
 uncertainty auf policy aktionen
 irgendwie Zeit als tradeoff rein bringen
 andere 3d modelle bekomm von rothkopfgeschickt
-
+funktionierendes Feature set bauen

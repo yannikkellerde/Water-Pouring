@@ -11,12 +11,12 @@ register(
     nondeterministic = True
 )
 register(
-    id='Pouring-simple-no-fix-v0',
-    entry_point='water_pouring.envs:Pouring_simple_no_fix',
+    id='Pouring-mdp-v0',
+    entry_point='water_pouring.envs:Pouring_mdp',
     nondeterministic = True
 )
 register(
-    id='Pouring-no-fix-v0',
-    entry_point='water_pouring.envs:Pouring_no_fix',
+    id='Pouring-mdp-full-v0',
+    entry_point='water_pouring.envs:Pouring_mdp_full',
     nondeterministic = True
 )

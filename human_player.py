@@ -37,7 +37,7 @@ def simple_mode():
             time.sleep(left_time)
 
 def mdp_mode():
-    env = gym.make("water_pouring:Pouring-mdp-v0",use_gui=True)
+    env = gym.make("water_pouring:Pouring-mdp-v0",use_gui=True,glas="beer.obj")
     
     full_rew = 0
     step_time = env.time_step_size * env.steps_per_action
@@ -75,6 +75,6 @@ def test():
     print("FULL REW 2:",full_rew)
 
 if __name__ == "__main__":
-    hard_mode()
+    #hard_mode()
     #simple_mode()
-    #mdp_mode()
+    mdp_mode()
