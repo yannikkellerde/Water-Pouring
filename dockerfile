@@ -29,4 +29,4 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
 
 #Run the program
 WORKDIR /usr/src/bachelorthesis/TD3
-CMD python3.7 main.py --env water_pouring:Pouring-mdp-full-v0
+CMD python3.7 --env water_pouring:Pouring-mdp-v0 --seed 100 --start_temperature 1 --time_step_punish 0.01 --load_model models/base_working/ --folder_name models/time_step_punish_0-01 --start_timesteps 100000
