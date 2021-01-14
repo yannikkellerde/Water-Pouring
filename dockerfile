@@ -22,10 +22,11 @@ RUN python3.7 -m pip install SPlisHSPlasH/
 
 # Make partio work
 RUN python3.7 -c "import os;os.makedirs('/root/.local/lib/python3.7/site-packages/',exist_ok=True)"
+RUN echo "export OMP_NUM_THREADS=8" >> /root/.bashrc
 COPY docker_stuff/site-packages/ /root/.local/lib/python3.7/site-packages/
 COPY docker_stuff/libpartio.so /usr/local/lib/
-#RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+ENV OMP_NUM_THREADS=8
 
 #Run the program
 WORKDIR /usr/src/bachelorthesis/TD3
