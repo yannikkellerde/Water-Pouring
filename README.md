@@ -1,5 +1,11 @@
 # Fluid flow + Graph networks + Human Water pouring
 
+# Literature
+https://www.researchgate.net/publication/280733055_Pouring_Skills_with_Planning_and_Learning_Modeled_from_Human_Demonstrations
+https://www.pnas.org/content/pnas/110/45/18327.full.pdf
+https://www.sciencedirect.com/science/article/abs/pii/S001002851730347X
+
+
 ## Solving POMDPs
 ### LSTM approach
 DRQN (discrete action space) https://arxiv.org/pdf/1507.06527.pdf  
