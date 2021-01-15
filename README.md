@@ -4,6 +4,8 @@
 https://www.researchgate.net/publication/280733055_Pouring_Skills_with_Planning_and_Learning_Modeled_from_Human_Demonstrations
 https://www.pnas.org/content/pnas/110/45/18327.full.pdf
 https://www.sciencedirect.com/science/article/abs/pii/S001002851730347X
+https://fias.uni-frankfurt.de/~rothkopf/docs/HayhoeRothkopf2010.pdf
+https://dl.acm.org/doi/abs/10.1145/1265957.1265960
 
 
 ## Solving POMDPs
