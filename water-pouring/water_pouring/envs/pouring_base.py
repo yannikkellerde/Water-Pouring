@@ -19,10 +19,10 @@ from pouring_utils.model3d import Model3d
 
 class Pouring_base(gym.Env):
     metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,obs_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="glas.obj"):
+    def __init__(self,use_gui=False,obs_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
         self.use_gui = use_gui
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
-        util.manip_scene_file(scene_base,self.scene_file,glas=glas)
+        util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
 
         # Gym
         self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
@@ -80,6 +80,8 @@ class Pouring_base(gym.Env):
 
     def reset(self,first=False,use_gui=None):
         if not first:
+            print("In glas:",self.particle_locations["glas"])
+        if not first:
             self.base.cleanup()
         if self.gui is not None:
             self.gui.die()
@@ -98,7 +100,7 @@ class Pouring_base(gym.Env):
         self.base.initBoundaryData()
 
         self.bottle = Model3d(self.sim.getCurrent().getBoundaryModel(1).getRigidBodyObject())
-        self.glas = Model3d(self.sim.getCurrent().getBoundaryModel(0).getRigidBodyObject())
+        self.glas = Model3d(self.sim.getCurrent().getBoundaryModel(0).getRigidBodyObject(),stretch_vertices=0.1)
         self.fluid = self.sim.getCurrent().getFluidModel(0)
         #print("particle count:",self.fluid.numActiveParticles())
 
@@ -208,15 +210,16 @@ class Pouring_base(gym.Env):
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             self.done = True
             punish += 200
-        if (self.particle_locations["air"]==0 and 0<R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation):
+        if (0<R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation):
             self.done = True
             if (self.particle_locations["glas"]==0):
-                punish += 200   # Might want to remove this at some point, hacky
+                punish += 200
         bottle_radians = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
         if bottle_radians + rot_radians*self.steps_per_action > math.pi:
             rot_radians = 0
-
-
+        tt,rr = self.glas.check_if_in_rect(self.bottle,to_translate*self.steps_per_action,rot_radians*self.steps_per_action)
+        to_translate = tt/self.steps_per_action
+        rot_radians = rr/self.steps_per_action
         to_rotate = R.from_euler("z",rot_radians).as_matrix()
         for step in range(self.steps_per_action):
             self.bottle.rotate(to_rotate)

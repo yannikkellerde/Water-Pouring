@@ -6,6 +6,8 @@ https://www.pnas.org/content/pnas/110/45/18327.full.pdf
 https://www.sciencedirect.com/science/article/abs/pii/S001002851730347X
 https://fias.uni-frankfurt.de/~rothkopf/docs/HayhoeRothkopf2010.pdf
 https://dl.acm.org/doi/abs/10.1145/1265957.1265960
+https://arxiv.org/abs/1509.02971
+https://arxiv.org/abs/1802.09477
 
 
 ## Solving POMDPs
