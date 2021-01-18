@@ -19,7 +19,7 @@ from pouring_utils.model3d import Model3d
 
 class Pouring_base(gym.Env):
     metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,obs_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
+    def __init__(self,use_gui=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
         self.use_gui = use_gui
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
@@ -30,6 +30,7 @@ class Pouring_base(gym.Env):
 
         # Hyperparameters
         ## Uncertainty
+        self.policy_uncertainty = policy_uncertainty
         self.obs_uncertainty = obs_uncertainty
         self.proposal_function_rate = 0.05
 
@@ -38,7 +39,7 @@ class Pouring_base(gym.Env):
         self.max_translation_x = 0.0015
         self.max_translation_y = 0.0015
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
-        self.max_rotation_radians = 0.002
+        self.max_rotation_radians = 0.003
         self.min_rotation = 1.22
 
         ## Rewards
@@ -196,10 +197,11 @@ class Pouring_base(gym.Env):
         for i,a in enumerate(action):
             if a<-1:
                 punish -= a
-                action[i] = -1
             elif a>1:
                 punish += a-1
-                action[i] = 1
+        if self.policy_uncertainty>0:
+            action = np.random.normal(action,np.abs(action)*self.policy_uncertainty)
+        action = np.clip(action,-1,1)
         self._step_number += 1
         rot_radians = -action[0]*self.max_rotation_radians
         to_translate = self.base_translation_vector*np.array([action[1],action[2],0],dtype=np.float)
@@ -210,7 +212,7 @@ class Pouring_base(gym.Env):
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             self.done = True
             punish += 200
-        if (0<R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation):
+        if (0<R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation and self.particle_locations["air"]==0):
             self.done = True
             if (self.particle_locations["glas"]==0):
                 punish += 200

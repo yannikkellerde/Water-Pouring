@@ -13,8 +13,6 @@ class Pouring_mdp_full(Pouring_base):
         self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(3,)),
                                                spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
 
-        self.max_rotation_radians = 0.003 # Hyperparameter manipulation. Might want to remove
-
     def _observe(self):
         fluid_data = []
         rotation = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]

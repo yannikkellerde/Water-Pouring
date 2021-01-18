@@ -57,13 +57,13 @@
 			"translation": [0.6,0.4,0],
 			"rotationAxis": [0, 0, 1],
 			"rotationAngle": 1.3,
-            "scale": [1,1,1],
+            		"scale": [1,1,1],
 			"color": [0.1, 0.4, 0.6, 1.0], 
 			"density": 100000,
 			"isDynamic": false,
 			"isWall": false,
-			"mapInvert": false, 
-			"mapThickness": -0.01,
+			"mapInvewwwrt": false, 
+			"mapThickness": -0.06,
 			"mapResolution": [20,20,20]
 		}
 		

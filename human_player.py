@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 def hard_mode():
-    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True)
+    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0.3)
     step_time = env.time_step_size * env.steps_per_action
     start = time.perf_counter()
     for i in range(4000):
