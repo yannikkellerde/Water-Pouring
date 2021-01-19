@@ -10,7 +10,7 @@ class Pouring_mdp_full(Pouring_base):
     def __init__(self,**kwargs):
         super(Pouring_mdp_full, self).__init__(**kwargs)
         self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
-        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(3,)),
+        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(5,)),
                                                spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
 
     def _observe(self):
@@ -26,7 +26,10 @@ class Pouring_mdp_full(Pouring_base):
             vel = self.fluid.getVelocity(i)
             fluid_data.append((pos[0]/2,pos[1]/2,pos[2]/2,vel[0],vel[1],vel[2],rotation,translation_x,translation_y))
         fluid_data = np.clip(fluid_data,-1,1)
-        feat_dat = np.array([rotation,translation_x,translation_y])
+        tsp_obs = ((self.time_step_punish-self.time_step_punish_range[0]) /
+                   (self.time_step_punish_range[1]-self.time_step_punish_range[0]))*2-1
+        time_obs = (self._step_number/self._max_episode_steps)*2-1
+        feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,time_obs])
         return feat_dat,fluid_data
 
 if __name__=="__main__":

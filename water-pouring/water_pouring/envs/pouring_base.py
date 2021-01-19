@@ -25,8 +25,8 @@ class Pouring_base(gym.Env):
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
 
         # Gym
-        self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
-        self.observation_space = spaces.Box(low=0,high=1,shape=(6,))
+        self.action_space = None
+        self.observation_space = None
 
         # Hyperparameters
         ## Uncertainty
@@ -43,7 +43,7 @@ class Pouring_base(gym.Env):
         self.min_rotation = 1.22
 
         ## Rewards
-        self.time_step_punish = 0.1
+        self.time_step_punish_range = [0,1]
         self.spill_punish = 15
         self.max_spill = 15
         self.hit_reward = 1
@@ -55,7 +55,7 @@ class Pouring_base(gym.Env):
         ## Simulation
         self.steps_per_action = 20
         self.time_step_size = 0.005
-        self._max_episode_steps = ((1/self.time_step_size)*30)/self.steps_per_action # 30 seconds
+        self._max_episode_steps = ((1/self.time_step_size)*20)/self.steps_per_action # 20 seconds
         self.max_in_glas = 250
         self.fluid_base_path = os.path.join(FILE_PATH,"models/fluids/fluid.bgeo")
         self.max_particles = count_particles(self.fluid_base_path)
@@ -65,19 +65,6 @@ class Pouring_base(gym.Env):
 
     def seed(self,seed):
         np.random.seed(seed)
-
-    def _walk_uncertaintys(self):
-        if self.obs_uncertainty == 0:
-            return
-        gaussian = norm(0,self.obs_uncertainty).pdf
-        for key in self.current_walk:
-            proposal_accepted = False
-            while not proposal_accepted:
-                proposal = np.random.normal(self.current_walk[key],self.obs_uncertainty*self.proposal_function_rate)
-                cur_height = gaussian(self.current_walk[key])
-                if random.random() < gaussian(proposal)/cur_height:
-                    proposal_accepted = True
-            self.current_walk[key] = proposal
 
     def reset(self,first=False,use_gui=None):
         if not first:
@@ -103,12 +90,10 @@ class Pouring_base(gym.Env):
         self.bottle = Model3d(self.sim.getCurrent().getBoundaryModel(1).getRigidBodyObject())
         self.glas = Model3d(self.sim.getCurrent().getBoundaryModel(0).getRigidBodyObject(),stretch_vertices=0.1)
         self.fluid = self.sim.getCurrent().getFluidModel(0)
-        #print("particle count:",self.fluid.numActiveParticles())
 
         self.particle_locations = self._get_particle_locations()
+        self.time_step_punish = random.random() * (self.time_step_punish_range[1]-self.time_step_punish_range[0]) + self.time_step_punish_range[0]
 
-        self.fill_observation = 0
-        self.water_flow_observations = deque(maxlen=self.max_observation_store)
         if self.obs_uncertainty == 0:
             self.current_walk = {
                 "rotation":0,
@@ -233,9 +218,6 @@ class Pouring_base(gym.Env):
         reward,true_reward = self._get_reward()
         reward-=punish
         true_reward-=punish
-        self.fill_observation = self.particle_locations["glas"]
-        self.water_flow_observations.append(old_particle_locations["bottle"]-self.particle_locations["bottle"])
-        self._walk_uncertaintys()
         observation = self._observe()
         if (self._step_number>self._max_episode_steps or 
             self.particle_locations["spilled"]>=self.max_spill):
@@ -247,38 +229,8 @@ class Pouring_base(gym.Env):
             raise Exception("Trying to render without initializing with gui_mode=True")
         self.gui.one_render()
 
-    def _normalize_observation(self,rotation,translation_x,translation_y,in_bottle,fill_state,water_flow_estimate):
-        rotation = (rotation-self.min_rotation)/(math.pi-self.min_rotation)
-        translation_x = (translation_x - self.translation_bounds[0][0]) / (self.translation_bounds[0][1]-self.translation_bounds[0][0])
-        translation_y = (translation_y - self.translation_bounds[1][0]) / (self.translation_bounds[1][1]-self.translation_bounds[1][0])
-        fill_state = fill_state/self.max_in_glas
-        water_flow_estimate = water_flow_estimate/self.max_water_flow
-        in_bottle = in_bottle/self.max_particles
-
-        rotation = rotation + self.current_walk["rotation"]
-        translation_x = translation_x + self.current_walk["translation_x"]
-        translation_y = translation_y + self.current_walk["translation_y"]
-        water_flow_estimate = water_flow_estimate + self.current_walk["water_flow"]
-        fill_state = fill_state + self.current_walk["fill_estimate"]
-        in_bottle = in_bottle + self.current_walk["bottle_fill"]
-
-        rotation = np.clip(rotation,0,1)
-        translation_x = np.clip(translation_x,0,1)
-        translation_y = np.clip(translation_y,0,1)
-        water_flow_estimate = np.clip(water_flow_estimate,0,1)
-        fill_state = np.clip(fill_state,0,1)
-        in_bottle = np.clip(in_bottle,0,1)
-        return rotation,translation_x,translation_y,in_bottle,fill_state,water_flow_estimate
-
-
     def _observe(self):
-        rotation = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
-        translation_x,translation_y = self.bottle.translation[:2]
-        water_flow_estimate = np.mean(self.water_flow_observations) if len(self.water_flow_observations)>0 else 0
-        fill_state = self.fill_observation
-        in_bottle = self.particle_locations["bottle"]
-        obs = self._normalize_observation(rotation,translation_x,translation_y,in_bottle,fill_state,water_flow_estimate)
-        return np.array(obs)
+        raise NotImplementedError("Observation not implemented")
 
 if __name__ == "__main__":
     env = Pouring_env(gui_mode=True)

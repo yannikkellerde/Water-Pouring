@@ -2,3 +2,4 @@ from water_pouring.envs.pouring_base import Pouring_base
 from water_pouring.envs.pouring_simple import Pouring_simple
 from water_pouring.envs.pouring_mdp import Pouring_mdp
 from water_pouring.envs.pouring_mdp_full import Pouring_mdp_full
+from water_pouring.envs.pouring_feature import Pouring_featured
