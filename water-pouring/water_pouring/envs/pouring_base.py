@@ -35,7 +35,7 @@ class Pouring_base(gym.Env):
         self.proposal_function_rate = 0.05
 
         ## Actions and Movement
-        self.translation_bounds = ((-0.5,1),(0,1.5))
+        self.translation_bounds = ((-0.5,1),(-0.2,1.5))
         self.max_translation_x = 0.0015
         self.max_translation_y = 0.0015
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
@@ -201,6 +201,8 @@ class Pouring_base(gym.Env):
             self.done = True
             if (self.particle_locations["glas"]==0):
                 punish += 200
+            else:
+                punish -= 50
         bottle_radians = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
         if bottle_radians + rot_radians*self.steps_per_action > math.pi:
             rot_radians = 0
@@ -221,6 +223,7 @@ class Pouring_base(gym.Env):
         observation = self._observe()
         if (self._step_number>self._max_episode_steps or 
             self.particle_locations["spilled"]>=self.max_spill):
+            punish += 50
             self.done = True
         return observation,reward,self.done,{"true_reward":true_reward}
 

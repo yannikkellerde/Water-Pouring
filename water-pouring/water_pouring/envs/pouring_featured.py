@@ -9,19 +9,19 @@ import os,sys
 FILE_PATH = os.path.abspath(os.path.dirname(__file__))
 class Pouring_featured(Pouring_base):
     def __init__(self,**kwargs):
-        super(Pouring_mdp_full, self).__init__(**kwargs)
-        self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
         self.particle_list_length = 3
-        self.observation_space = spaces.Box(low=-1,high=1,shape=(5+4*self.particle_list_length,))
         self.max_in_air = 10
+        super(Pouring_featured, self).__init__(**kwargs)
+        self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
+        self.observation_space = spaces.Box(low=-1,high=1,shape=(5+4*self.particle_list_length,))
 
     def reset(self,*args,**kwargs):
-        self.paricle_hist = deque(maxlen=self.particle_list_length)
-        super(Pouring_featured, self).reset(*args,**kwargs)
+        self.particle_hist = deque(maxlen=self.particle_list_length)
+        return super(Pouring_featured, self).reset(*args,**kwargs)
 
     def _particle_hist_to_observation(self):
         observes = []
-        for i in range(self.particle_locations):
+        for i in range(self.particle_list_length):
             if len(self.particle_hist) > i:
                 obs = []
                 obs.append(self.particle_hist[i]["glas"]/self.max_in_glas)
