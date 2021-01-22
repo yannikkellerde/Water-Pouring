@@ -19,8 +19,11 @@ from pouring_utils.model3d import Model3d
 
 class Pouring_base(gym.Env):
     metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
+    def __init__(self,use_gui=False,fixed_tsp=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
         self.use_gui = use_gui
+        self.fixed_tsp = fixed_tsp
+        if self.fixed_tsp:
+            self.time_step_punish = 0.1
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
 
@@ -92,7 +95,8 @@ class Pouring_base(gym.Env):
         self.fluid = self.sim.getCurrent().getFluidModel(0)
 
         self.particle_locations = self._get_particle_locations()
-        self.time_step_punish = random.random() * (self.time_step_punish_range[1]-self.time_step_punish_range[0]) + self.time_step_punish_range[0]
+        if not self.fixed_tsp:
+            self.time_step_punish = random.random() * (self.time_step_punish_range[1]-self.time_step_punish_range[0]) + self.time_step_punish_range[0]
 
         if self.obs_uncertainty == 0:
             self.current_walk = {
@@ -203,6 +207,10 @@ class Pouring_base(gym.Env):
                 punish += 200
             else:
                 punish -= 50
+        if (self._step_number>self._max_episode_steps or 
+            self.particle_locations["spilled"]>=self.max_spill):
+            punish += 50
+            self.done = True
         bottle_radians = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
         if bottle_radians + rot_radians*self.steps_per_action > math.pi:
             rot_radians = 0
@@ -221,10 +229,6 @@ class Pouring_base(gym.Env):
         reward-=punish
         true_reward-=punish
         observation = self._observe()
-        if (self._step_number>self._max_episode_steps or 
-            self.particle_locations["spilled"]>=self.max_spill):
-            punish += 50
-            self.done = True
         return observation,reward,self.done,{"true_reward":true_reward}
 
     def render(self, mode='human'):
