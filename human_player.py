@@ -5,14 +5,11 @@ import os
 
 def hard_mode():
     env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0.3)
-    print(env.observation_space,env.action_space)
-    exit()
     step_time = env.time_step_size * env.steps_per_action
     start = time.perf_counter()
     for i in range(4000):
         x,y,r = env.gui.get_bottle_x(),env.gui.get_bottle_y(),env.gui.get_bottle_rotation()
         observation,reward,done,info = env.step((r,x,y))
-        print(observation)
         env.render()
         if done:
             env.reset()

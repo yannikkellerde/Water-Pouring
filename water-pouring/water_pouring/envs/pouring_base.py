@@ -72,6 +72,7 @@ class Pouring_base(gym.Env):
     def reset(self,first=False,use_gui=None):
         if not first:
             print("In glas:",self.particle_locations["glas"])
+            print("Spilled:",self.particle_locations["spilled"])
         if not first:
             self.base.cleanup()
         if self.gui is not None:
