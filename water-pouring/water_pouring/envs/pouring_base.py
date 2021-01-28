@@ -213,9 +213,10 @@ class Pouring_base(gym.Env):
                 punish += 200
             # else:
             #     punish -= 50
-        if (self._step_number>self._max_episode_steps or 
-            self.particle_locations["spilled"]>=self.max_spill):
+        if (self._step_number>self._max_episode_steps):
             punish += 50
+            self.done = True
+        if (self.particle_locations["spilled"]>=self.max_spill):
             self.done = True
         bottle_radians = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
         if bottle_radians + rot_radians*self.steps_per_action > math.pi:
