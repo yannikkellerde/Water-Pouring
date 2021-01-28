@@ -16,6 +16,7 @@ COPY requirements.txt .
 COPY water-pouring ./water-pouring
 RUN git clone git://github.com/yannikkellerde/SPlisHSPlasH.git
 RUN git clone git://github.com/yannikkellerde/TD3.git
+RUN git clone git://github.com/yannikkellerde/spinningup.git
 RUN python3.7 -m pip install -r requirements.txt
 RUN python3.7 -m pip install -e water-pouring/
 RUN python3.7 -m pip install SPlisHSPlasH/

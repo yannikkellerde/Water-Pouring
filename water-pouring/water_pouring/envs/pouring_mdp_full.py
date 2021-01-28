@@ -28,8 +28,10 @@ class Pouring_mdp_full(Pouring_base):
         fluid_data = np.clip(fluid_data,-1,1)
         tsp_obs = ((self.time_step_punish-self.time_step_punish_range[0]) /
                    (self.time_step_punish_range[1]-self.time_step_punish_range[0]))*2-1
-        time_obs = (self._step_number/self._max_episode_steps)*2-1
-        feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,time_obs])
+        #time_obs = (self._step_number/self._max_episode_steps)*2-1
+        spill_punish_obs = ((self.spill_punish-self.spill_range[0]) /
+                            (self.spill_range[1]-self.spill_range[0]))*2-1
+        feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,spill_punish_obs])
         return feat_dat,fluid_data
 
 if __name__=="__main__":

@@ -19,11 +19,13 @@ from pouring_utils.model3d import Model3d
 
 class Pouring_base(gym.Env):
     metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,fixed_tsp=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
+    def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
         self.use_gui = use_gui
         self.fixed_tsp = fixed_tsp
         if self.fixed_tsp:
             self.time_step_punish = 0.1
+        if self.fixed_spill:
+            self.spill_punish = 15
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
 
@@ -47,7 +49,7 @@ class Pouring_base(gym.Env):
 
         ## Rewards
         self.time_step_punish_range = [0,1]
-        self.spill_punish = 15
+        self.spill_range = [1,50]
         self.max_spill = 15
         self.hit_reward = 1
         self.temperature = 1
@@ -98,6 +100,8 @@ class Pouring_base(gym.Env):
         self.particle_locations = self._get_particle_locations()
         if not self.fixed_tsp:
             self.time_step_punish = random.random() * (self.time_step_punish_range[1]-self.time_step_punish_range[0]) + self.time_step_punish_range[0]
+        if not self.fixed_spill:
+            self.spill_punish = random.random() * (self.spill_range[1]-self.spill_range[0]) + self.spill_range[0]
 
         if self.obs_uncertainty == 0:
             self.current_walk = {
@@ -206,8 +210,8 @@ class Pouring_base(gym.Env):
             self.done = True
             if (self.particle_locations["glas"]==0):
                 punish += 200
-            else:
-                punish -= 50
+            # else:
+            #     punish -= 50
         if (self._step_number>self._max_episode_steps or 
             self.particle_locations["spilled"]>=self.max_spill):
             punish += 50
