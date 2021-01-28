@@ -22,6 +22,7 @@ class Pouring_base(gym.Env):
     def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
         self.use_gui = use_gui
         self.fixed_tsp = fixed_tsp
+        self.fixed_spill = fixed_spill
         if self.fixed_tsp:
             self.time_step_punish = 0.1
         if self.fixed_spill:
