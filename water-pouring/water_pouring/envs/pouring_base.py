@@ -71,11 +71,16 @@ class Pouring_base(gym.Env):
 
     def seed(self,seed):
         np.random.seed(seed)
+    
+    def set_max_spill(self):
+        self.max_spill = 225/self.spill_punish
 
     def reset(self,first=False,use_gui=None):
         if not first:
             print("In glas:",self.particle_locations["glas"])
             print("Spilled:",self.particle_locations["spilled"])
+            print("Spill punish",self.spill_punish)
+            print("TSP",self.time_step_punish)
         if not first:
             self.base.cleanup()
         if self.gui is not None:
@@ -103,6 +108,7 @@ class Pouring_base(gym.Env):
             self.time_step_punish = random.random() * (self.time_step_punish_range[1]-self.time_step_punish_range[0]) + self.time_step_punish_range[0]
         if not self.fixed_spill:
             self.spill_punish = random.random() * (self.spill_range[1]-self.spill_range[0]) + self.spill_range[0]
+            self.set_max_spill()
 
         if self.obs_uncertainty == 0:
             self.current_walk = {
