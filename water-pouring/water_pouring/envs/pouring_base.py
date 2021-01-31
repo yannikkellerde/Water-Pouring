@@ -80,6 +80,7 @@ class Pouring_base(gym.Env):
             print("In glas:",self.particle_locations["glas"])
             print("Spilled:",self.particle_locations["spilled"])
             print("Spill punish",self.spill_punish)
+            print("Max spill",self.max_spill)
             print("TSP",self.time_step_punish)
         if not first:
             self.base.cleanup()
@@ -212,15 +213,15 @@ class Pouring_base(gym.Env):
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action > self.translation_bounds[1][1] or
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             self.done = True
-            punish += 200
+            punish += 500
         if (0<R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation and self.particle_locations["air"]==0):
             self.done = True
             if (self.particle_locations["glas"]==0):
-                punish += 200
+                punish += 500
             # else:
             #     punish -= 50
         if (self._step_number>self._max_episode_steps):
-            punish += 50
+            punish += 100
             self.done = True
         if (self.particle_locations["spilled"]>=self.max_spill):
             self.done = True
