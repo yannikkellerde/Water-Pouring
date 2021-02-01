@@ -35,7 +35,7 @@ def hard_mode():
             #input()
 
 def g2g():
-    env = gym.make("water_pouring:Pouring-g2g-featured-v0",use_gui=True,policy_uncertainty=0.3)
+    env = gym.make("water_pouring:Pouring-g2g-mdp-v0",use_gui=True,policy_uncertainty=0.3)
     step_time = env.time_step_size * env.steps_per_action
     start = time.perf_counter()
     tot_rew = 0

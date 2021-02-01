@@ -19,4 +19,7 @@ class Pouring_G2G_mdp(Pouring_mdp_full):
         self.max_translation_y = 0.003
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
         self.max_in_glas = 187
+        self.max_particles = 187
         self.translation_bounds = ((-0.5,1.5),(-0.2,1.5))
+        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(6,)),
+                                               spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
