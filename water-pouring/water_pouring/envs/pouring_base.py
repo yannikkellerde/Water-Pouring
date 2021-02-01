@@ -215,7 +215,6 @@ class Pouring_base(gym.Env):
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             self.done = True
             punish += 500
-        print(R.from_matrix(self.bottle.rotation).as_euler("zyx")[0])
         if ((R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation) and self.particle_locations["air"]==0 and self.particle_locations["glas"]!=0):
             self.done = True
             #if (self.particle_locations["glas"]==0):
