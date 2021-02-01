@@ -16,7 +16,7 @@ glass_map = {"normal.obj":{"max_particles":255,
                          "mapThickness":-0.07},
              "beer.obj":{"max_particles":295,
                          "mapThickness":-0.05},
-             "coctail.obj":{"max_particles":140,
+             "cocktail.obj":{"max_particles":140,
                             "mapThickness":-0.03}
 }
 
@@ -34,3 +34,5 @@ def manip_scene_file(in_scene,out_file,env,glas=None,bottle=None,fluid=None):
         scene["FluidModels"][0]["particleFile"] = os.path.join("../models/fluids/",fluid)
     with open(out_file,"w") as f:
         json.dump(scene,f)
+
+#def glass_to_glass(in_scene,out_file,env,glass):

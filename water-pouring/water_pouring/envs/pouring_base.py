@@ -29,6 +29,7 @@ class Pouring_base(gym.Env):
             self.spill_punish = 15
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
+        remove_particles(os.path.join(FILE_PATH,"models","fluids","fluid.bgeo"),os.path.join(FILE_PATH,"models","fluids","tmp_fluid.bgeo"),0.3)
 
         # Gym
         self.action_space = None
@@ -214,10 +215,11 @@ class Pouring_base(gym.Env):
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             self.done = True
             punish += 500
-        if (0<R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation and self.particle_locations["air"]==0):
+        print(R.from_matrix(self.bottle.rotation).as_euler("zyx")[0])
+        if ((R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation) and self.particle_locations["air"]==0 and self.particle_locations["glas"]!=0):
             self.done = True
-            if (self.particle_locations["glas"]==0):
-                punish += 500
+            #if (self.particle_locations["glas"]==0):
+            #    punish += 500
             # else:
             #     punish -= 50
         if (self._step_number>self._max_episode_steps):

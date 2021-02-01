@@ -20,3 +20,13 @@ register(
     entry_point='water_pouring.envs:Pouring_featured',
     nondeterministic = True
 )
+register(
+    id='Pouring-g2g-mdp-v0',
+    entry_point='water_pouring.envs:Pouring_G2G_mdp',
+    nondeterministic = True
+)
+register(
+    id='Pouring-g2g-featured-v0',
+    entry_point='water_pouring.envs:Pouring_G2G_featured',
+    nondeterministic = True
+)
