@@ -23,6 +23,7 @@ class Pouring_base(gym.Env):
         self.use_gui = use_gui
         self.fixed_tsp = fixed_tsp
         self.fixed_spill = fixed_spill
+        self.fixed_target_fill = fixed_target_fill
         self.time_step_punish = 0.1
         self.spill_punish = 15
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
@@ -64,7 +65,6 @@ class Pouring_base(gym.Env):
         self.max_in_glas = 250
         self.target_fill_range = [30,self.max_in_glas]
         self.target_fill_state = self.max_in_glas
-        self.fixed_target_fill = fixed_target_fill
         self.fluid_base_path = os.path.join(os.path.dirname(self.scene_file),util.get_fluid_path(self.scene_file))
         self.max_particles = count_particles(self.fluid_base_path)
 
@@ -81,13 +81,10 @@ class Pouring_base(gym.Env):
         if not first:
             print("In glas:",self.particle_locations["glas"])
             print("Spilled:",self.particle_locations["spilled"])
-            if not self.fixed_spill:
-                print("Spill punish",self.spill_punish)
-                print("Max spill",self.max_spill)
-            if not self.fixed_tsp:
-                print("TSP",self.time_step_punish)
-            if not self.fixed_target_fill:
-                print("Target fill",self.target_fill_state)
+            print("Spill punish",self.spill_punish)
+            print("Max spill",self.max_spill)
+            print("TSP",self.time_step_punish)
+            print("Target fill",self.target_fill_state)
         if not first:
             self.base.cleanup()
         if self.gui is not None:
