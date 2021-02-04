@@ -58,7 +58,9 @@ class Pouring_featured(Pouring_base):
         time_obs = (self._step_number/self._max_episode_steps)*2-1
         spill_punish_obs = ((self.spill_punish-self.spill_range[0]) /
                             (self.spill_range[1]-self.spill_range[0]))*2-1
-        feat_dat = [rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,time_obs]
+        target_fill_obs = ((self.target_fill_state-self.target_fill_range[0]) /
+                            (self.target_fill_range[1]-self.target_fill_range[0]))*2-1
+        feat_dat = [rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,target_fill_obs,time_obs]
         feat_dat.extend(self._particle_hist_to_observation())
         feat_dat = np.clip(np.array(feat_dat),-1,1)
         return feat_dat

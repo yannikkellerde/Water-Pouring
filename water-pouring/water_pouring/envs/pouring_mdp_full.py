@@ -10,7 +10,7 @@ class Pouring_mdp_full(Pouring_base):
     def __init__(self,**kwargs):
         super(Pouring_mdp_full, self).__init__(**kwargs)
         self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
-        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(6,)),
+        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(7,)),
                                                spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
 
     def _observe(self):
@@ -31,7 +31,9 @@ class Pouring_mdp_full(Pouring_base):
         time_obs = (self._step_number/self._max_episode_steps)*2-1
         spill_punish_obs = ((self.spill_punish-self.spill_range[0]) /
                             (self.spill_range[1]-self.spill_range[0]))*2-1
-        feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,time_obs])
+        target_fill_obs = ((self.target_fill_state-self.target_fill_range[0]) /
+                            (self.target_fill_range[1]-self.target_fill_range[0]))*2-1
+        feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,target_fill_obs,time_obs])
         return feat_dat,fluid_data
 
 if __name__=="__main__":

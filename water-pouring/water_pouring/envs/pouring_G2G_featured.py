@@ -17,5 +17,8 @@ class Pouring_G2G_featured(Pouring_featured):
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
         self.max_in_glas = 187
         self.max_particles = 187
+        self.target_fill_range = [30,self.max_in_glas]
+        self.target_fill_state = self.max_in_glas
         self.max_in_air = 80
         self.translation_bounds = ((-0.5,1.5),(-0.2,1.5))
+        self.reset(first=True)

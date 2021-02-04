@@ -4,14 +4,7 @@ import numpy as np
 import os
 
 def hard_mode():
-    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0.3,scene_base="water-pouring/water_pouring/envs/scenes/glass_to_glass.json")
-    env.max_spill=300
-    env.min_rotation = -0.2
-    env.max_rotation_radians = 0.006
-    env.max_translation_x = 0.003
-    env.max_translation_y = 0.003
-    env.base_translation_vector = np.array([env.max_translation_x, env.max_translation_y,0])
-    env._max_episode_steps = 1000000
+    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0.3)
     step_time = env.time_step_size * env.steps_per_action
     start = time.perf_counter()
     tot_rew = 0
@@ -50,7 +43,7 @@ def g2g():
         env.render()
         if done:
             print("Reward",tot_rew,"\n tsp",env.time_step_punish,"\n spill",env.spill_punish,"\n Time",t)
-            exit()
+            #exit()
             env.reset()
             tot_rew = 0
             t = 0
@@ -140,6 +133,7 @@ def test():
     print("FULL REW 2:",full_rew)
 
 if __name__ == "__main__":
+    #hard_mode()
     g2g()
     #featured()
     #simple_mode()

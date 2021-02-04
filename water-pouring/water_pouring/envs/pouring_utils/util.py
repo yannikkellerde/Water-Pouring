@@ -35,4 +35,9 @@ def manip_scene_file(in_scene,out_file,env,glas=None,bottle=None,fluid=None):
     with open(out_file,"w") as f:
         json.dump(scene,f)
 
+def get_fluid_path(in_scene):
+    with open(in_scene,"r") as f:
+        scene = json.load(f)
+    return scene["FluidModels"][0]["particleFile"]
+
 #def glass_to_glass(in_scene,out_file,env,glass):
