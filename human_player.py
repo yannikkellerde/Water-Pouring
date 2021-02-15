@@ -1,6 +1,7 @@
 import gym
 import time
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 import os
 
 def hard_mode():
@@ -12,8 +13,11 @@ def hard_mode():
     for i in range(4000):
         x,y,r = env.gui.get_bottle_x(),env.gui.get_bottle_y(),env.gui.get_bottle_rotation()
         observation,reward,done,info = env.step((r,x,y))
-        #print(observation[0])
-        print(env.particle_locations)
+        rotation = R.from_matrix(env.bottle.rotation).as_euler("zyx")[0]
+        translation_x,translation_y = env.bottle.translation[:2]
+        #print(translation_x,translation_y,rotation)
+        print(observation[0],np.min(observation[1],axis=0),np.max(observation[1],axis=0))
+        #print(env.particle_locations)
         tot_rew += reward
         t+=1
         env.render()
@@ -38,6 +42,7 @@ def g2g():
         observation,reward,done,info = env.step((r,x,y))
         #print(observation)
         #print(env.particle_locations["air"])
+        print(env.particle_locations)
         tot_rew += reward
         t+=1
         env.render()
@@ -133,8 +138,8 @@ def test():
     print("FULL REW 2:",full_rew)
 
 if __name__ == "__main__":
-    #hard_mode()
-    g2g()
+    hard_mode()
+    #g2g()
     #featured()
     #simple_mode()
     #mdp_mode()

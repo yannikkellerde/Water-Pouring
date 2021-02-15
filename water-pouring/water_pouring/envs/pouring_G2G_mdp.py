@@ -14,12 +14,11 @@ class Pouring_G2G_mdp(Pouring_mdp_full):
         #self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(6,)),
         #                                       spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
         self.min_rotation = 0
-        self.max_rotation_radians = 0.006
-        self.max_translation_x = 0.003
-        self.max_translation_y = 0.003
+        self.max_rotation_radians = self.max_rotation_radians*2
+        self.max_translation_x = self.max_translation_x*2
+        self.max_translation_y = self.max_translation_y*2
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
-        self.max_in_glas = 187
-        self.max_particles = 187
+        self.max_in_glas = self.max_particles
         self.target_fill_range = [30,self.max_in_glas]
         self.target_fill_state = self.max_in_glas
         self.translation_bounds = ((-0.5,1.5),(-0.2,1.5))

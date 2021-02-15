@@ -28,7 +28,7 @@ class Pouring_base(gym.Env):
         self.spill_punish = 15
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
-        #remove_particles(os.path.join(FILE_PATH,"models","fluids","fluid.bgeo"),os.path.join(FILE_PATH,"models","fluids","tmp_fluid.bgeo"),0.3)
+        #remove_particles(os.path.join(FILE_PATH,"models","fluids","fluid.bgeo"),os.path.join(FILE_PATH,"models","fluids","tmp_fluid.bgeo"),0.55)
 
         # Gym
         self.action_space = None
@@ -41,9 +41,9 @@ class Pouring_base(gym.Env):
         self.proposal_function_rate = 0.05
 
         ## Actions and Movement
-        self.translation_bounds = ((-0.5,1),(-0.2,1.5))
-        self.max_translation_x = 0.0015
-        self.max_translation_y = 0.0015
+        self.translation_bounds = ((-0.1,0.2),(-0.04,0.3))
+        self.max_translation_x = 4e-4
+        self.max_translation_y = 4e-4
         self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
         self.max_rotation_radians = 0.003
         self.min_rotation = 1.22
@@ -53,7 +53,6 @@ class Pouring_base(gym.Env):
         self.spill_range = [1,50]
         self.max_spill = 15
         self.hit_reward = 1
-        self.temperature = 1
 
         ## Features
         self.max_observation_store = 5
@@ -62,11 +61,12 @@ class Pouring_base(gym.Env):
         self.steps_per_action = 20
         self.time_step_size = 0.005
         self._max_episode_steps = ((1/self.time_step_size)*20)/self.steps_per_action # 20 seconds
-        self.max_in_glas = 250
+        self.max_in_glas = 390
         self.target_fill_range = [30,self.max_in_glas]
         self.target_fill_state = self.max_in_glas
         self.fluid_base_path = os.path.join(os.path.dirname(self.scene_file),util.get_fluid_path(self.scene_file))
         self.max_particles = count_particles(self.fluid_base_path)
+        print(self.max_particles)
 
         self.gui = None
         self.reset(first=True)
@@ -74,8 +74,14 @@ class Pouring_base(gym.Env):
     def seed(self,seed):
         np.random.seed(seed)
     
+    def _calc_max_spill(self,spill_punish):
+        return 250/self.spill_punish
+
     def set_max_spill(self):
-        self.max_spill = 225/self.spill_punish
+        self.max_spill = self._calc_max_spill(self.spill_punish)
+
+    def _get_random(self,attr_range):
+        return random.random() * (attr_range[1]-attr_range[0]) + attr_range[0]
 
     def reset(self,first=False,use_gui=None):
         if not first:
@@ -109,12 +115,12 @@ class Pouring_base(gym.Env):
 
         self.particle_locations = self._get_particle_locations()
         if not self.fixed_tsp:
-            self.time_step_punish = random.random() * (self.time_step_punish_range[1]-self.time_step_punish_range[0]) + self.time_step_punish_range[0]
+            self.time_step_punish = self._get_random(self.time_step_punish_range)
         if not self.fixed_spill:
-            self.spill_punish = random.random() * (self.spill_range[1]-self.spill_range[0]) + self.spill_range[0]
+            self.spill_punish = self._get_random(self.spill_range)
             self.set_max_spill()
         if not self.fixed_target_fill:
-            self.target_fill_state = random.random() * (self.target_fill_range[1]-self.target_fill_range[0]) + self.target_fill_range[0]
+            self.target_fill_state = self._get_random(self.target_fill_range)
 
         if self.obs_uncertainty == 0:
             self.current_walk = {
@@ -139,17 +145,21 @@ class Pouring_base(gym.Env):
         self.done = False
         return self._observe()
 
-    def _score_locations(self,locations):
-        return np.array((self.target_fill_state-abs(locations["glas"]-self.target_fill_state)*self.hit_reward,min(locations["spilled"],self.max_spill)*self.spill_punish))
+    def _score_locations(self,locations,target_fill_state,spill_punish,max_spill):
+        return np.array((target_fill_state-abs(locations["glas"]-target_fill_state)*self.hit_reward,min(locations["spilled"],max_spill)*spill_punish))
+
+    def _imagine_reward(self,time_step_punish,spill_punish,target_fill_state):
+        max_spill = self._calc_max_spill(spill_punish)
+        new_locations = self._get_particle_locations()
+        reward,punish = (self._score_locations(new_locations,target_fill_state,spill_punish,max_spill) -
+                         self._score_locations(self.particle_locations,target_fill_state,spill_punish,max_spill))
+        punish += time_step_punish
+        score = reward-punish
+        self.particle_locations = new_locations
+        return score
 
     def _get_reward(self):
-        new_locations = self._get_particle_locations()
-        reward,punish = self._score_locations(new_locations)-self._score_locations(self.particle_locations)
-        punish += self.time_step_punish
-        true_score = reward-punish
-        score = reward-punish*self.temperature
-        self.particle_locations = new_locations
-        return score,true_score
+        return self._imagine_reward(self.time_step_punish,self.spill_punish,self.target_fill_state)
 
     def _get_particle_locations(self):
         res = {
@@ -241,11 +251,10 @@ class Pouring_base(gym.Env):
             self.base.timeStepNoGUI()
         self.bottle.body.updateVertices()
         old_particle_locations = self.particle_locations
-        reward,true_reward = self._get_reward()
+        reward = self._get_reward()
         reward-=punish
-        true_reward-=punish
         observation = self._observe()
-        return observation,reward,self.done,{"true_reward":true_reward}
+        return observation,reward,self.done,{}
 
     def render(self, mode='human'):
         if self.gui is None:

@@ -13,6 +13,15 @@ class Pouring_mdp_full(Pouring_base):
         self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(7,)),
                                                spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
 
+    def _to_observations(self,tsp,spill_punish,target_fill):
+        tsp_obs = ((tsp-self.time_step_punish_range[0]) /
+                   (self.time_step_punish_range[1]-self.time_step_punish_range[0]))*2-1
+        spill_punish_obs = ((spill_punish-self.spill_range[0]) /
+                            (self.spill_range[1]-self.spill_range[0]))*2-1
+        target_fill_obs = ((target_fill-self.target_fill_range[0]) /
+                            (self.target_fill_range[1]-self.target_fill_range[0]))*2-1
+        return tsp_obs,spill_punish_obs,target_fill_obs
+
     def _observe(self):
         fluid_data = []
         rotation = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
@@ -24,17 +33,18 @@ class Pouring_mdp_full(Pouring_base):
         for i in range(self.fluid.numActiveParticles()):
             pos = self.fluid.getPosition(i)
             vel = self.fluid.getVelocity(i)
-            fluid_data.append((pos[0]/2,pos[1]/2,pos[2]/2,vel[0],vel[1],vel[2],rotation,translation_x,translation_y))
+            fluid_data.append((pos[0],pos[1],pos[2],vel[0],vel[1],vel[2],rotation,translation_x,translation_y))
         fluid_data = np.clip(fluid_data,-1,1)
-        tsp_obs = ((self.time_step_punish-self.time_step_punish_range[0]) /
-                   (self.time_step_punish_range[1]-self.time_step_punish_range[0]))*2-1
+        
         time_obs = (self._step_number/self._max_episode_steps)*2-1
-        spill_punish_obs = ((self.spill_punish-self.spill_range[0]) /
-                            (self.spill_range[1]-self.spill_range[0]))*2-1
-        target_fill_obs = ((self.target_fill_state-self.target_fill_range[0]) /
-                            (self.target_fill_range[1]-self.target_fill_range[0]))*2-1
+        tsp_obs,spill_punish_obs,target_fill_obs = self._to_observations(self.time_step_punish,self.spill_punish,self.target_fill_state)
+
         feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,target_fill_obs,time_obs])
         return feat_dat,fluid_data
+
+    def manip_state(self,state,tsp,spill_punish,target_fill):
+        tsp_obs,spill_punish_obs,target_fill_obs = self._to_observations(tsp,spill_punish,target_fill)
+        state[0][3],state[0][4],state[0][5] = tsp_obs,spill_punish_obs,target_fill_obs
 
 if __name__=="__main__":
     observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(1,)),spaces.Box(low=-1,high=1,shape=(400,))))
