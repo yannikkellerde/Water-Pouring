@@ -139,12 +139,13 @@ class Pouring_base(gym.Env):
         return self._observe()
 
     def _score_locations(self,locations,target_fill_state,spill_punish,max_spill):
-        return np.array((target_fill_state-abs(locations["glas"]-target_fill_state)*self.hit_reward,min(locations["spilled"],max_spill)*spill_punish))
+        hit_reward = (self.max_in_glas/target_fill_state)*self.hit_reward
+        return np.array((target_fill_state-abs(locations["glas"]-target_fill_state)*hit_reward,min(locations["spilled"],max_spill)*spill_punish))
 
     def _imagine_reward(self,time_step_punish,spill_punish,target_fill_state):
         new_locations = self._get_particle_locations()
-        reward,punish = (self._score_locations(new_locations,target_fill_state,spill_punish,max_spill) -
-                         self._score_locations(self.particle_locations,target_fill_state,spill_punish,max_spill))
+        reward,punish = (self._score_locations(new_locations,target_fill_state,spill_punish,self.max_spill) -
+                         self._score_locations(self.particle_locations,target_fill_state,spill_punish,self.max_spill))
         punish += time_step_punish
         score = reward-punish
         self.particle_locations = new_locations

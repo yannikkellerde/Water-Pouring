@@ -5,7 +5,7 @@
 		"pause":false,
 		"particleRadius": 0.01,
         "timeStepSize": 0.005,
-        "cameraPosition":[0,0.5,2],
+        "cameraPosition":[0,0.5,1.5],
 		"numberOfStepsPerRenderUpdate": 1,
 		"density0": 1000, 
 		"simulationMethod": 4,
