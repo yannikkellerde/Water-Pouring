@@ -49,9 +49,9 @@ class Pouring_base(gym.Env):
         self.min_rotation = 1.22
 
         ## Rewards
-        self.time_step_punish_range = [0,1]
+        self.time_step_punish_range = [0,2]
         self.spill_range = [1,50]
-        self.max_spill = 15
+        self.max_spill = 20
         self.hit_reward = 1
 
         ## Features
@@ -73,12 +73,6 @@ class Pouring_base(gym.Env):
 
     def seed(self,seed):
         np.random.seed(seed)
-    
-    def _calc_max_spill(self,spill_punish):
-        return 250/self.spill_punish
-
-    def set_max_spill(self):
-        self.max_spill = self._calc_max_spill(self.spill_punish)
 
     def _get_random(self,attr_range):
         return random.random() * (attr_range[1]-attr_range[0]) + attr_range[0]
@@ -118,7 +112,6 @@ class Pouring_base(gym.Env):
             self.time_step_punish = self._get_random(self.time_step_punish_range)
         if not self.fixed_spill:
             self.spill_punish = self._get_random(self.spill_range)
-            self.set_max_spill()
         if not self.fixed_target_fill:
             self.target_fill_state = self._get_random(self.target_fill_range)
 
@@ -149,7 +142,6 @@ class Pouring_base(gym.Env):
         return np.array((target_fill_state-abs(locations["glas"]-target_fill_state)*self.hit_reward,min(locations["spilled"],max_spill)*spill_punish))
 
     def _imagine_reward(self,time_step_punish,spill_punish,target_fill_state):
-        max_spill = self._calc_max_spill(spill_punish)
         new_locations = self._get_particle_locations()
         reward,punish = (self._score_locations(new_locations,target_fill_state,spill_punish,max_spill) -
                          self._score_locations(self.particle_locations,target_fill_state,spill_punish,max_spill))

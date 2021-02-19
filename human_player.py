@@ -6,7 +6,7 @@ import os
 
 def hard_mode():
     env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0.3)
-    step_time = env.time_step_size * env.steps_per_action
+    step_time = env.time_step_size * env.steps_per_action *3
     start = time.perf_counter()
     tot_rew = 0
     t = 0
@@ -26,7 +26,7 @@ def hard_mode():
             env.reset()
             tot_rew = 0
             t = 0
-        left_time = i*step_time+start - time.perf_counter()
+        left_time = i*step_time + start - time.perf_counter()
         if left_time>0:
             time.sleep(left_time)
             #input()
