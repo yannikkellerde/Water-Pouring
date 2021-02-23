@@ -24,7 +24,7 @@ class Pouring_base(gym.Env):
         self.fixed_tsp = fixed_tsp
         self.fixed_spill = fixed_spill
         self.fixed_target_fill = fixed_target_fill
-        self.time_step_punish = 0.1
+        self.time_step_punish = 1
         self.spill_punish = 15
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
         util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
