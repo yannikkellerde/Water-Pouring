@@ -58,7 +58,7 @@ def g2g():
             time.sleep(left_time)
 
 def featured():
-    env = gym.make("water_pouring:Pouring-featured-v0",use_gui=True,policy_uncertainty=0.3)
+    env = gym.make("water_pouring:Pouring-featured-v0",use_gui=True,policy_uncertainty=0.3,scene_base="water-pouring/water_pouring/envs/scenes/smaller_scene.json")
     step_time = env.time_step_size * env.steps_per_action
     start = time.perf_counter()
     tot_rew = 0
@@ -67,8 +67,8 @@ def featured():
     for i in range(4000):
         x,y,r = env.gui.get_bottle_x(),env.gui.get_bottle_y(),env.gui.get_bottle_rotation()
         observation,reward,done,info = env.step((r,x,y))
-        print(observation)
-        print(env.particle_locations["air"])
+        #print(observation)
+        print(env.particle_locations["glas"])
         tot_rew += reward
         t+=1
         env.render()
@@ -146,7 +146,7 @@ def test():
 if __name__ == "__main__":
     #with_evals()
     #hard_mode()
-    g2g()
-    #featured()
+    #g2g()
+    featured()
     #simple_mode()
     #mdp_mode()
