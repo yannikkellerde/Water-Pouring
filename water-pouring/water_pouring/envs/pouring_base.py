@@ -155,7 +155,6 @@ class Pouring_base(gym.Env):
                 pun_jerk += self.jerk_punish*(util.approx_3rd_deriv(*action_np[:,i],self.time_step_size*self.steps_per_action)**2)
             if pun_jerk > 10:
                 pun_jerk = 10
-            print(pun_jerk)
             punish += pun_jerk
         score = reward-punish
         self.particle_locations = new_locations
