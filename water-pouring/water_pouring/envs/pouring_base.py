@@ -19,7 +19,7 @@ from pouring_utils.model3d import Model3d
 
 class Pouring_base(gym.Env):
     metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,fixed_target_fill=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join("scenes","simple_scene.json"),glas="normal.obj"):
+    def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,fixed_target_fill=False,obs_uncertainty=0,policy_uncertainty=0,jerk_punish=0,scene_base=os.path.join("scenes","simple_scene.json"),glas="normal.obj"):
         self.scene_base = os.path.join(FILE_PATH,scene_base)
         self.use_gui = use_gui
         self.fixed_tsp = fixed_tsp
@@ -54,9 +54,8 @@ class Pouring_base(gym.Env):
         self.spill_range = [1,50]
         self.max_spill = 20
         self.hit_reward = 1
+        self.jerk_punish = jerk_punish
 
-        ## Features
-        self.max_observation_store = 5
 
         ## Simulation
         self.steps_per_action = 20
@@ -137,6 +136,7 @@ class Pouring_base(gym.Env):
         self.time = 0
         self._step_number = 0
         self.done = False
+        self.last_actions = deque([[0,0,0] for i in range(4)],maxlen=4)
         return self._observe()
 
     def _score_locations(self,locations,target_fill_state,spill_punish,max_spill):
@@ -148,6 +148,15 @@ class Pouring_base(gym.Env):
         reward,punish = (self._score_locations(new_locations,target_fill_state,spill_punish,self.max_spill) -
                          self._score_locations(self.particle_locations,target_fill_state,spill_punish,self.max_spill))
         punish += time_step_punish
+        if self.jerk_punish>0:
+            pun_jerk = 0
+            action_np = np.array(self.last_actions)
+            for i in range(self.action_space.shape[0]):
+                pun_jerk += self.jerk_punish*(util.approx_3rd_deriv(*action_np[:,i],self.time_step_size*self.steps_per_action)**2)
+            if pun_jerk > 10:
+                pun_jerk = 10
+            print(pun_jerk)
+            punish += pun_jerk
         score = reward-punish
         self.particle_locations = new_locations
         return score
@@ -203,6 +212,7 @@ class Pouring_base(gym.Env):
                 Some particle statistics
         """
         action = np.array(action)
+        self.last_actions.appendleft(action)
         punish = 0
         if len(action)!=3 or np.any(action>1) or np.any(action<-1):
             raise ValueError("Invalid action {}".format(action))

@@ -10,7 +10,7 @@ class Pouring_mdp_full(Pouring_base):
     def __init__(self,**kwargs):
         super(Pouring_mdp_full, self).__init__(**kwargs)
         self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
-        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(7,)),
+        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(7+(3*self.action_space.shape[0] if self.jerk_punish>0 else 0),)),
                                                spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
 
     def _to_observations(self,tsp,spill_punish,target_fill):
@@ -39,7 +39,10 @@ class Pouring_mdp_full(Pouring_base):
         time_obs = (self._step_number/self._max_episode_steps)*2-1
         tsp_obs,spill_punish_obs,target_fill_obs = self._to_observations(self.time_step_punish,self.spill_punish,self.target_fill_state)
 
-        feat_dat = np.array([rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,target_fill_obs,time_obs])
+        feat_dat = [rotation,translation_x,translation_y,tsp_obs,spill_punish_obs,target_fill_obs,time_obs]
+        if self.jerk_punish>0:
+            feat_dat.extend(np.array(self.last_actions)[:-1].flatten())
+        feat_dat = np.array(feat_dat)
         return feat_dat,fluid_data
 
     def manip_state(self,state,tsp,spill_punish,target_fill):

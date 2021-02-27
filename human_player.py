@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 import os,sys
+import random
 
 def hard_mode():
     env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0.3)
@@ -57,13 +58,26 @@ def g2g():
         if left_time>0:
             time.sleep(left_time)
 
+def try_jerk_punish():
+    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0,jerk_punish=1e-4)
+    trajectory = []
+    vel = 0
+    wp = 0
+    for i in range(10):
+        #wp = np.clip(wp+random.random()/5-0.1,-1,1)
+        wp = (i/9)**2
+        trajectory.append([wp,0,0])
+    for t in trajectory:
+        print("rot",t[0])
+        observation,reward,done,info = env.step(t)
+        env.render()
+
 def featured():
     env = gym.make("water_pouring:Pouring-featured-v0",use_gui=True,policy_uncertainty=0.3,scene_base="water-pouring/water_pouring/envs/scenes/smaller_scene.json")
     step_time = env.time_step_size * env.steps_per_action
     start = time.perf_counter()
     tot_rew = 0
     t = 0
-    time.sleep(3)
     for i in range(4000):
         x,y,r = env.gui.get_bottle_x(),env.gui.get_bottle_y(),env.gui.get_bottle_rotation()
         observation,reward,done,info = env.step((r,x,y))
@@ -147,6 +161,7 @@ if __name__ == "__main__":
     #with_evals()
     #hard_mode()
     #g2g()
-    featured()
+    #featured()
+    try_jerk_punish()
     #simple_mode()
     #mdp_mode()

@@ -40,4 +40,7 @@ def get_fluid_path(in_scene):
         scene = json.load(f)
     return scene["FluidModels"][0]["particleFile"]
 
+def approx_3rd_deriv(f_x0,f_x0_minus_1h,f_x0_minus_2h,f_x0_minus_3h,h):
+    return (1*f_x0-3*f_x0_minus_1h+3*f_x0_minus_2h-1*f_x0_minus_3h)/(h**3)
+
 #def glass_to_glass(in_scene,out_file,env,glass):
