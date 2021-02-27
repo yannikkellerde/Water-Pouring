@@ -59,17 +59,21 @@ def g2g():
             time.sleep(left_time)
 
 def try_jerk_punish():
-    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0,jerk_punish=1e-4)
+    env = gym.make("water_pouring:Pouring-mdp-full-v0",use_gui=True,policy_uncertainty=0,jerk_punish=2e-4)
     trajectory = []
     vel = 0
     wp = 0
-    for i in range(10):
-        #wp = np.clip(wp+random.random()/5-0.1,-1,1)
-        wp = (i/9)**2
-        trajectory.append([wp,0,0])
-    for t in trajectory:
-        print("rot",t[0])
-        observation,reward,done,info = env.step(t)
+    #for t in trajectory:
+    for i in range(20):
+        #action = env.action_space.sample()
+        if i<5:
+            vel+=0.02
+        else:
+            vel-=0.02
+        wp += vel
+        action = [wp,0,0]
+        print(action)
+        observation,reward,done,info = env.step(action)
         env.render()
 
 def featured():

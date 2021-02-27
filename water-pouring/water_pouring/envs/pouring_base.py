@@ -136,7 +136,7 @@ class Pouring_base(gym.Env):
         self.time = 0
         self._step_number = 0
         self.done = False
-        self.last_actions = deque([[0,0,0] for i in range(4)],maxlen=4)
+        self.last_actions = deque([[0,0,0] for i in range(3)],maxlen=3)
         return self._observe()
 
     def _score_locations(self,locations,target_fill_state,spill_punish,max_spill):
@@ -152,9 +152,10 @@ class Pouring_base(gym.Env):
             pun_jerk = 0
             action_np = np.array(self.last_actions)
             for i in range(self.action_space.shape[0]):
-                pun_jerk += self.jerk_punish*(util.approx_3rd_deriv(*action_np[:,i],self.time_step_size*self.steps_per_action)**2)
+                pun_jerk += self.jerk_punish*(util.approx_2rd_deriv(*action_np[:,i],self.time_step_size*self.steps_per_action)**2)
             if pun_jerk > 10:
                 pun_jerk = 10
+            print(pun_jerk)
             punish += pun_jerk
         score = reward-punish
         self.particle_locations = new_locations

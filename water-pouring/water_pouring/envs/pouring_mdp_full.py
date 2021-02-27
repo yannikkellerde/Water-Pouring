@@ -10,7 +10,7 @@ class Pouring_mdp_full(Pouring_base):
     def __init__(self,**kwargs):
         super(Pouring_mdp_full, self).__init__(**kwargs)
         self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
-        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(7+(3*self.action_space.shape[0] if self.jerk_punish>0 else 0),)),
+        self.observation_space = spaces.Tuple((spaces.Box(low=-1,high=1,shape=(7+(2*self.action_space.shape[0] if self.jerk_punish>0 else 0),)),
                                                spaces.Box(low=-1,high=1,shape=(self.max_particles,9))))
 
     def _to_observations(self,tsp,spill_punish,target_fill):
