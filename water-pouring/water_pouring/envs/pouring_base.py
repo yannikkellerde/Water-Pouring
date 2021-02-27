@@ -19,7 +19,8 @@ from pouring_utils.model3d import Model3d
 
 class Pouring_base(gym.Env):
     metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,fixed_target_fill=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join(FILE_PATH,"scenes","simple_scene.json"),glas="normal.obj"):
+    def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,fixed_target_fill=False,obs_uncertainty=0,policy_uncertainty=0,scene_base=os.path.join("scenes","simple_scene.json"),glas="normal.obj"):
+        self.scene_base = os.path.join(FILE_PATH,scene_base)
         self.use_gui = use_gui
         self.fixed_tsp = fixed_tsp
         self.fixed_spill = fixed_spill
@@ -27,7 +28,7 @@ class Pouring_base(gym.Env):
         self.time_step_punish = 1
         self.spill_punish = 15
         self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
-        util.manip_scene_file(scene_base,self.scene_file,env=self,glas=glas)
+        util.manip_scene_file(self.scene_base,self.scene_file,env=self,glas=glas)
         #remove_particles(os.path.join(FILE_PATH,"models","fluids","fluid.bgeo"),os.path.join(FILE_PATH,"models","fluids","tmp_fluid.bgeo"),0.55)
 
         # Gym
