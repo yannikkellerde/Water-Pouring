@@ -17,7 +17,7 @@ Now you can install the water-pouring environment with `pip install -e water-pou
 Run `python human_player` to test the installation. In this test program, you can control the bottle yourself using the arrow keys and W/S.
 
 ## Provided environments
-**water_pouring:Pouring-mdp-v0** - Pour from a bottle into a glass while getting the full simulators state as observations.
-**water_pouring:Pouring-featured-v0** - Pour from a bottle into a glass while getting handcrafted features as observations that do not fully describe the state of the simulator.
-**water_pouring:Pouring-g2g-mdp-v0** - Pour from a glass into another glass while getting the full simulators state as observations.
-**water_pouring:Pouring-featured-v0** - Pour from a glass into another glass while getting handcrafted features as observations.
+**water_pouring:Pouring-mdp-v0** - Pour from a bottle into a glass while getting the full simulators state as observations.  
+**water_pouring:Pouring-featured-v0** - Pour from a bottle into a glass while getting handcrafted features as observations that do not fully describe the state of the simulator.  
+**water_pouring:Pouring-g2g-mdp-v0** - Pour from a glass into another glass while getting the full simulators state as observations.  
+**water_pouring:Pouring-featured-v0** - Pour from a glass into another glass while getting handcrafted features as observations.  
