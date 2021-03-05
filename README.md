@@ -3,7 +3,7 @@
 This repository contains a water-pouring Reinforcement Learning environment implemented in OpenAI gym.
 
 ## Installation
-Installation has been tested an Ubuntu 18.04 machine. Other Debian based distributions shoud work as well, otherwise you are probably out of luck. Because this project uses the fluid-simulator SPlisHSPlasH there are a few packages that are required to get going. There is a [dockerfile](dockerfile) provided that shows all steps required for a successfull installation. If that does not work for you, the following are the dependencies:
+Installation has been tested on a Ubuntu 18.04 machine. Other Debian based distributions should work as well, otherwise you are probably out of luck. Because this project uses the fluid-simulator SPlisHSPlasH there are a few packages that are required to get going. There is a [dockerfile](dockerfile) provided that shows all steps required for a successfull installation. If that does not work for you, the following are the dependencies:
 
 1. python3.7, other versions might work as well
 2. The following apt packages: cmake, build-essential, libx11-dev, xorg-dev, libglu1-mesa-dev, python3.7-dev, python3-setuptools
