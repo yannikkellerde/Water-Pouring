@@ -1,18 +1,8 @@
 from gym.envs.registration import register
 
 register(
-    id='Pouring-Simple-v0',
-    entry_point='water_pouring.envs:Pouring_simple',
-    nondeterministic = True
-)
-register(
     id='Pouring-mdp-v0',
-    entry_point='water_pouring.envs:Pouring_mdp',
-    nondeterministic = True
-)
-register(
-    id='Pouring-mdp-full-v0',
-    entry_point='water_pouring.envs:Pouring_mdp_full',
+    entry_point='water_pouring.envs:Pouring_MDP',
     nondeterministic = True
 )
 register(
@@ -22,7 +12,7 @@ register(
 )
 register(
     id='Pouring-g2g-mdp-v0',
-    entry_point='water_pouring.envs:Pouring_G2G_mdp',
+    entry_point='water_pouring.envs:Pouring_G2G_MDP',
     nondeterministic = True
 )
 register(

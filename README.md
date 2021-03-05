@@ -1,38 +1,23 @@
-# Fluid flow + Graph networks + Human Water pouring
+# Water-pouring Gym environment
 
-# Literature
-https://www.researchgate.net/publication/280733055_Pouring_Skills_with_Planning_and_Learning_Modeled_from_Human_Demonstrations
-https://www.pnas.org/content/pnas/110/45/18327.full.pdf
-https://www.sciencedirect.com/science/article/abs/pii/S001002851730347X
-https://fias.uni-frankfurt.de/~rothkopf/docs/HayhoeRothkopf2010.pdf
-https://dl.acm.org/doi/abs/10.1145/1265957.1265960
-https://arxiv.org/abs/1509.02971
-https://arxiv.org/abs/1802.09477
+This repository contains a water-pouring Reinforcement Learning environment implemented in OpenAI gym.
 
+## Installation
+Installation has been tested an Ubuntu 18.04 machine. Other Debian based distributions shoud work as well, otherwise you are probably out of luck. Because this project uses the fluid-simulator SPlisHSPlasH there are a few packages that are required to get going. There is a [dockerfile](dockerfile) provided that shows all steps required for a successfull installation. If that does not work for you, the following are the dependencies:
 
-## Solving POMDPs
-### LSTM approach
-DRQN (discrete action space) https://arxiv.org/pdf/1507.06527.pdf  
-RDPG (continuous action space) https://arxiv.org/pdf/1710.02896.pdf, https://arxiv.org/pdf/1512.04455.pdf  
-TU master thesis https://www.ias.informatik.tu-darmstadt.de/uploads/Team/JoniPajarinen/master_thesis_hong_linh_thai_2018.pdf  
-### Partially observable Monte-Carlo planning algorithm (POMCP)
-D. Silver and J. Veness. Monte-carlo planning in large pomdps. In J. D. Lafferty, C. K. I. Williams, J. Shawe-Taylor,
-R. S. Zemel, and A. Culotta, editors, Advances in Neural Information Processing Systems 23, pages 2164–2172.
-Curran Associates, Inc., 2010.
+1. python3.7, other versions might work as well
+2. The following apt packages: cmake, build-essential, libx11-dev, xorg-dev, libglu1-mesa-dev, python3.7-dev, python3-setuptools
+3. The python packages in requirements.txt. I would recommend using a virtualenv.
+4. My SPlisHSPlasH fork on https://github.com/yannikkellerde/SPlisHSPlasH. Install by cloning the repo and running `pip install SPlisHSPlasH/`. Installation might take a few minutes.
+5. Partio's python bindings https://github.com/wdas/partio. Installation of the python bindings can be a little tricky. I would recommend just copying the libpartio.so libary that is provided in the [docker_stuff](docker_stuff/) folder in this repo to a location included in your LD_LIBRARY_PATH and copying the files from [docker_stuff/site_packages](docker_stuff/site_packages) to your virtualenv site-packages.
 
-## Simulators with code
-* http://taichi.graphics/wp-content/uploads/2019/03/mls-mpm-cpic.pdf - https://github.com/yuanming-hu/taichi_mpm
+Now you can install the water-pouring environment with `pip install -e water-pouring/` from this repositories root.
 
-## Simulators without code
-* https://dl.acm.org/doi/10.1145/2786784.2786796
+## Testing the installation
+Run `python human_player` to test the installation. In this test program, you can control the bottle yourself using the arrow keys and W/S.
 
-## Libarys
-* https://github.com/deepmind/graph_nets
-
-## Papers without code
-* https://arxiv.org/pdf/2002.09405.pdf
-* https://openreview.net/attachment?id=B1lDoJSYDH&name=original_pdf
-* https://arxiv.org/pdf/1909.05862.pdf
-
-## Papers with code
-* https://arxiv.org/pdf/2007.04439.pdf - https://github.com/locuslab/cfd-gcn
+## Provided environments
+**water_pouring:Pouring-mdp-v0** - Pour from a bottle into a glass while getting the full simulators state as observations.
+**water_pouring:Pouring-featured-v0** - Pour from a bottle into a glass while getting handcrafted features as observations that do not fully describe the state of the simulator.
+**water_pouring:Pouring-g2g-mdp-v0** - Pour from a glass into another glass while getting the full simulators state as observations.
+**water_pouring:Pouring-featured-v0** - Pour from a glass into another glass while getting handcrafted features as observations.

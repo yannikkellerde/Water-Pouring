@@ -1,7 +1,7 @@
-gym
-scipy
+gym==0.18.0
+scipy==1.5.4
 numpy
-tqdm
+tqdm==4.55.0
 torch==1.2
 torchvision==0.4.0
-rtpt
+rtpt==0.0.4

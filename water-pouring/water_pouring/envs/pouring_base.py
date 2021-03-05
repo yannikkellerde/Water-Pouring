@@ -16,81 +16,153 @@ sys.path.append(FILE_PATH)
 import pouring_utils.util as util
 from pouring_utils.partio_utils import remove_particles, count_particles
 from pouring_utils.model3d import Model3d
+from abc import ABC, abstractmethod
 
-class Pouring_base(gym.Env):
-    metadata = {'render.modes': ['human']}
-    def __init__(self,use_gui=False,fixed_spill=False,fixed_tsp=False,fixed_target_fill=False,obs_uncertainty=0,policy_uncertainty=0,jerk_punish=0,scene_base=os.path.join("scenes","simple_scene.json"),glas="normal.obj"):
-        self.scene_base = os.path.join(FILE_PATH,scene_base)
-        self.use_gui = use_gui
-        self.fixed_tsp = fixed_tsp
-        self.fixed_spill = fixed_spill
-        self.fixed_target_fill = fixed_target_fill
-        self.time_step_punish = 1
-        self.spill_punish = 15
-        self.scene_file = os.path.join(FILE_PATH,"scenes","tmp_scene.json")
-        util.manip_scene_file(self.scene_base,self.scene_file,env=self,glas=glas)
-        #remove_particles(os.path.join(FILE_PATH,"models","fluids","fluid.bgeo"),os.path.join(FILE_PATH,"models","fluids","tmp_fluid.bgeo"),0.55)
+class Pouring_base(ABC,gym.Env):
+    """An abstract base class for a water-pouring gym environment that uses
+    SPlishSPlash as a fluid simulator.
 
-        # Gym
-        self.action_space = None
-        self.observation_space = None
+    Attributes:
+        action_space: Gym action space that defines the shape of possible actions that can be performed.
+        observation_space: Gym observation space that defines the shape of observations obtained from the
+                           environment.
+        policy_uncertainty: Standard deviation of the signal dependent noise added to
+                            all actions from the agent.
+        translation_bounds: Maximimum and minimum bottle translation in x and y direction.
+        base_translation_vector: 3d Vector capturing the maximum amount of meters the bottle can be translated
+                                 in x,y or z direction.
+        max_rotation_radians: Maximum amount of radians, the bottle can be rotated each step.
+        min_rotation: If the bottle is lowered below this amount of radians, the episode ends (assuming at
+                      least on water-particle has been successfully poured in)
+        time_step_punish_range: The range in which the time_step_punish varies when it is randomized.
+        spill_range: The range in which the spill_punish varies when it is randomized.
+        target_fill_range: The range in which the target_fill_state varies when it is randomized.
+        time_step_punish: Negative reward per step taken in the environment.
+        spill_punish: Negative reward given per spilled water-particle.
+        target_fill_state: Target fill-level the agent is supposed to reach.
+        fixed_tsp: If true, the time_step_punish won't be randomized when resetting the environment.
+        fixed_spill: If true, the spill_punish won't be randomized when resetting the environment.
+        fixed_target_fill: If true, the target_fill_state won't be randomized when resetting the environment.
+        hit_reward: Reward that is gained per correctly poured in particle.
+        max_spill: After this many spilled partilces, the episode ends.
+        jerk_punish: Scaling factor for the jerk-based reward regularization that punishes non-smooth motion.
+        use_gui: If true, rendering is enables. Otherwise trying to render will throw a RuntimeException.
+        scene_file: Path to the SPlisHSPlasH scene file that describes the setting of the pouring scene.
+        steps_per_action: One step in the gym environment corresponds to this many steps in the fluid
+                          simulator.
+        time_step_size: One step in the fluid simulator captures this many seconds of simulation.
+        _max_episode_steps: After this many steps an episode ends.
+        max_in_glass: Volume of the glass in number of water-particles that fit.
+        max_particles: Total number of water-particles in the simulation.
+        gui: Reference to a SPlisHSPlasH gui.
+        sim: Reference to the SPlisHSPlasH Simulator instance.
+        base: Reference to the SPlisHSPlasH SimulatorBase instance.
+        bottle: A Model3d instance that handles the properties of the bottle.
+        glass: A Model3d instance that handles the properties of the glass.
+        fluid: A reference to the SPlisHSPlasH fluid model.
+        particle_locations: A dictionary obtained from _get_particle_locations() that stores where
+                            water-particles are in the environment.
+        time: Simulation time in seconds that has passed since the start of the episode.
+        _step_number: How many steps have been performed since the start of the episode.
+        done: Weather it is time to reset the environment.
+        last_actions: The actions performed in the last two steps.
+    """
+    metadata = {'render.modes': ['human']} # Gym compatibility
 
-        # Hyperparameters
-        ## Uncertainty
+    @abstractmethod
+    def __init__(self, use_gui=False, fixed_spill=True, fixed_tsp=True,
+                 fixed_target_fill=True,policy_uncertainty=0,jerk_punish=0,
+                 scene_base=os.path.join("scenes","simple_scene.json")):
+        """
+        Initializes the gym environment as well as the fluid simulator.
+
+        Args:
+            use_gui: Initialize the simulator for rendering. Without use_gui=True,
+                     rendering throws an error.
+            fixed_spill: When fixed_spill=False, the spill_punish will be randomized
+                        every time the environment is reset.
+            fixed_tsp: When fixed_tsp=False, the time_step_punish will be randomized
+                        every time the environment is reset.
+            fixed_target_fill: When fixed_target_fill=False, the target_fill_state will
+                                be randomized every time the environment is reset.
+            policy_uncertainty: Standard deviation of the signal dependent noise added to
+                                all actions from the agent.
+            jerk_punish: Scaling factor for how much negative reward is given for very
+                        non-smooth actions (High third derrivative magnitude (jerk))
+            scene_base: The scene file that will used to set the environment
+        """
+
+        self.action_space = NotImplemented
+        self.observation_space = NotImplemented
+
+        # Actions and Movement
         self.policy_uncertainty = policy_uncertainty
-        self.obs_uncertainty = obs_uncertainty
-        self.proposal_function_rate = 0.05
-
-        ## Actions and Movement
         self.translation_bounds = ((-0.1,0.2),(-0.04,0.3))
-        self.max_translation_x = 4e-4
-        self.max_translation_y = 4e-4
-        self.base_translation_vector = np.array([self.max_translation_x, self.max_translation_y,0])
+        max_translation_x = 4e-4
+        max_translation_y = 4e-4
+        self.base_translation_vector = np.array([max_translation_x, max_translation_y,0])
         self.max_rotation_radians = 0.003
         self.min_rotation = 1.22
 
-        ## Rewards
+        # Rewards
+        self.max_in_glass = 390
         self.time_step_punish_range = [0,2]
         self.spill_range = [1,50]
-        self.max_spill = 20
+        self.target_fill_range = [30,self.max_in_glass]
+        self.fixed_tsp = fixed_tsp
+        self.fixed_spill = fixed_spill
+        self.fixed_target_fill = fixed_target_fill
         self.hit_reward = 1
+        self.time_step_punish = 1
+        self.spill_punish = 15
+        self.max_spill = 20
+        self.target_fill_state = self.max_in_glass
         self.jerk_punish = jerk_punish
 
 
-        ## Simulation
+        # Simulation
+        self.use_gui = use_gui
+        self.scene_file = os.path.join(FILE_PATH,scene_base)
         self.steps_per_action = 20
-        self.time_step_size = 0.005
+        self.time_step_size = util.extract_time_step_size(self.scene_file)
         self._max_episode_steps = ((1/self.time_step_size)*20)/self.steps_per_action # 20 seconds
-        self.max_in_glas = 390
-        self.target_fill_range = [30,self.max_in_glas]
-        self.target_fill_state = self.max_in_glas
-        self.fluid_base_path = os.path.join(os.path.dirname(self.scene_file),util.get_fluid_path(self.scene_file))
-        self.max_particles = count_particles(self.fluid_base_path)
-        print(self.max_particles)
-
+        fluid_base_path = os.path.join(os.path.dirname(self.scene_file),util.get_fluid_path(self.scene_file))
+        self.max_particles = count_particles(fluid_base_path)
         self.gui = None
+
         self.reset(first=True)
 
     def seed(self,seed):
+        """
+        Seeding might not work perfectly for this environment
+        because the simulator does not behave exactly the same
+        every time.
+
+        Args:
+            seed: An integer seed for the random number generator.
+        """
         np.random.seed(seed)
 
-    def _get_random(self,attr_range):
-        return random.random() * (attr_range[1]-attr_range[0]) + attr_range[0]
 
-    def reset(self,first=False,use_gui=None):
-        if not first:
-            print("In glas:",self.particle_locations["glas"])
-            print("Spilled:",self.particle_locations["spilled"])
-            print("Spill punish",self.spill_punish)
-            print("Max spill",self.max_spill)
-            print("TSP",self.time_step_punish)
-            print("Target fill",self.target_fill_state)
+    def reset(self,first=False,use_gui=False,printstate=False):
+        """
+        Reset the gym environment as well as the fluid simulator.
+
+        Args:
+            first: Only set to true when calling from the constructor.
+            use_gui: If true, the environment will be initialized for rendering.
+            printstate: If true, print the new values of randomized parameters and
+                        the final particle states from the last episode.
+
+        Returns:
+            The state of the environment after resetting
+        """
         if not first:
             self.base.cleanup()
         if self.gui is not None:
             self.gui.die()
         self.gui = None
-        if use_gui is not None:
+        if use_gui:
             self.use_gui = use_gui
         self.base = pysplishsplash.Exec.SimulatorBase()
         self.base.init(useGui=self.use_gui,outputDir=os.path.join(FILE_PATH,"particles"),sceneFile=self.scene_file)
@@ -104,46 +176,63 @@ class Pouring_base(gym.Env):
         self.base.initBoundaryData()
 
         self.bottle = Model3d(self.sim.getCurrent().getBoundaryModel(1).getRigidBodyObject())
-        self.glas = Model3d(self.sim.getCurrent().getBoundaryModel(0).getRigidBodyObject(),stretch_vertices=0.1)
+        self.glass = Model3d(self.sim.getCurrent().getBoundaryModel(0).getRigidBodyObject(),stretch_vertices=0.1)
         self.fluid = self.sim.getCurrent().getFluidModel(0)
 
-        self.particle_locations = self._get_particle_locations()
         if not self.fixed_tsp:
-            self.time_step_punish = self._get_random(self.time_step_punish_range)
+            self.time_step_punish = util.get_random(self.time_step_punish_range)
         if not self.fixed_spill:
-            self.spill_punish = self._get_random(self.spill_range)
+            self.spill_punish = util.get_random(self.spill_range)
         if not self.fixed_target_fill:
-            self.target_fill_state = self._get_random(self.target_fill_range)
+            self.target_fill_state = util.get_random(self.target_fill_range)
 
-        if self.obs_uncertainty == 0:
-            self.current_walk = {
-                "rotation":0,
-                "translation_x":0,
-                "translation_y":0,
-                "fill_estimate":0,
-                "water_flow":0,
-                "bottle_fill":0
-            }
-        else:
-            self.current_walk = {
-                "rotation":np.random.normal(0,self.obs_uncertainty),
-                "translation_x":np.random.normal(0,self.obs_uncertainty),
-                "translation_y":np.random.normal(0,self.obs_uncertainty),
-                "fill_estimate":np.random.normal(0,self.obs_uncertainty),
-                "water_flow":np.random.normal(0,self.obs_uncertainty),
-                "bottle_fill":np.random.normal(0,self.obs_uncertainty)
-            }
+        if printstate:
+            if not first:
+                print("In glass:",self.particle_locations["glass"])
+                print("Spilled:",self.particle_locations["spilled"])
+            print("Spill punish",self.spill_punish)
+            print("TSP",self.time_step_punish)
+            print("Target fill",self.target_fill_state)
+
+        self.particle_locations = self._get_particle_locations()
         self.time = 0
         self._step_number = 0
         self.done = False
         self.last_actions = deque([[0,0,0] for i in range(3)],maxlen=3)
         return self._observe()
 
+
     def _score_locations(self,locations,target_fill_state,spill_punish,max_spill):
-        hit_reward = (self.max_in_glas/target_fill_state)*self.hit_reward
-        return np.array((target_fill_state-abs(locations["glas"]-target_fill_state)*hit_reward,min(locations["spilled"],max_spill)*spill_punish))
+        """
+        Calculate the a score for how good the current state is based on the locations
+        of all water particles.
+
+        Args:
+            locations: A dictionary that has been obtained by calling _get_particle_locations
+            target_fill_state: The fill-level the agent is supposed to reach. This may be different
+                               from the attribute self.target_fill_level
+            spill_punish: How negatively should spilled particles influence the score
+            max_spill: Describes after how much spillage an episode does end.
+
+        Returns:
+            A two entry numpy array containing a score for any positive things about the state
+            and a score for everything negative.
+        """
+        hit_reward = (self.max_in_glass/target_fill_state)*self.hit_reward
+        return np.array((target_fill_state-abs(locations["glass"]-target_fill_state)*hit_reward,min(locations["spilled"],max_spill)*spill_punish))
+
 
     def _imagine_reward(self,time_step_punish,spill_punish,target_fill_state):
+        """Imagine what rewards would be given if the parameters were different.
+
+        Args:
+            time_step_punish: Default negative reward for each step taken in the environment.
+            spill_punish: Negative reward per spilled particle.
+            target_fill_state: The target fill-level the agent is supposed to reach.
+
+        Returns:
+            A scalar reward calcuated for the given parameters.
+        """
         new_locations = self._get_particle_locations()
         reward,punish = (self._score_locations(new_locations,target_fill_state,spill_punish,self.max_spill) -
                          self._score_locations(self.particle_locations,target_fill_state,spill_punish,self.max_spill))
@@ -160,13 +249,31 @@ class Pouring_base(gym.Env):
         self.particle_locations = new_locations
         return score
 
+
     def _get_reward(self):
+        """Calculate the amount of reward that is obtained by the transition to the current state.
+
+        Returns:
+            A scalar reward value.
+        """
         return self._imagine_reward(self.time_step_punish,self.spill_punish,self.target_fill_state)
 
+
     def _get_particle_locations(self):
+        """Figure out where the water particles are in the current state. This means answering the
+        questions:
+            1) How many particles are in the bottle
+            2) How many particles are in the glass
+            3) How many particles are in the air between the bottle and the glass
+            4) How many particles have been spilled
+
+        Returns:
+            A dictionary that maps from 'bottle', 'glass', 'air' and 'spilled' to the integer number
+            of water particles in that location.
+        """
         res = {
             "bottle":0,
-            "glas":0,
+            "glass":0,
             "air":0,
             "spilled":0
         }
@@ -178,37 +285,38 @@ class Pouring_base(gym.Env):
                                  self.bottle.new_translation,self.bottle.new_rotation)
         res["bottle"] = np.sum(in_bottle)
         fluid_positions = fluid_positions[~in_bottle]
-        in_glas = self.glas.hull.find_simplex(fluid_positions)>=0
-        res["glas"] = np.sum(in_glas)
-        fluid_positions = fluid_positions[~in_glas]
-        spilled = fluid_positions[:,1]<self.glas.orig_rect[1][1]
+        in_glass = self.glass.hull.find_simplex(fluid_positions)>=0
+        res["glass"] = np.sum(in_glass)
+        fluid_positions = fluid_positions[~in_glass]
+        spilled = fluid_positions[:,1]<self.glass.orig_rect[1][1]
         res["spilled"] = np.sum(spilled)
         fluid_positions = fluid_positions[~spilled]
         res["air"] = len(fluid_positions)
         return res
 
+
     def step(self,action):
-        """Move the bottle, to pour water into the glas.
+        """Perform one step in the environment using the fluid simulator.
 
-        Parameters
-        ----------
-        action (np.array): A 4-dimensional vector of floats between 0 and 1 representing:
-                    0: Rotation: For values <0.5 rotate the botte downwards, for >0.5 upwards.
-                    1: Translation-x: For <0.5 move towards glas, for >0.5 away from glas.
-                    2: Translation-y: For <0.5 move down, for >0.5, move up.
+        Parameters:
+        action: A 3-dimensional vector of floats between -1 and 1 representing:
+                1. Rotation: For values < 0 rotate the botte downwards, for > 0 upwards.
+                2. Translation-x: For < 0 move bottle towards glass, for > 0 away from glass.
+                3. Translation-y: For < 0 move bottle down, for > 0, move up.
 
-        Returns
-        -------
-        ob, reward, episode_over, info : tuple
-            ob (6-tuple) :
-                Entries represent in order: bottle-rotation, bottle-translation-x, bottle-translation-y,
-                bottle_fill, estimated fluid level in glas, estimated rate of water flow.
-            reward (float) :
-                +1 for landing a water particle in the glas. -10 for spilling a water particle.
-            episode_over (bool) :
+        Returns:
+            A four-tuple consisting of:
+            1) observation:
+                The observation of the environment. Shape depends on concrete value of
+                self.observation_space
+            2) reward:
+                The reward obtained by performing the action in the environment
+            3) done:
                 Whether it's time to reset the environment again.
-            info (dict) :
-                Some particle statistics
+            4) info:
+                An empty dictionary.
+        Raises:
+            ValueError: If an invalid action was given as an argument.
         """
         action = np.array(action)
         self.last_actions.appendleft(action)
@@ -229,9 +337,9 @@ class Pouring_base(gym.Env):
         if (self.bottle.translation[1] + to_translate[1]*self.steps_per_action > self.translation_bounds[1][1] or
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             to_translate[1] = 0
-        if ((R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation) and self.particle_locations["air"]==0 and self.particle_locations["glas"]!=0):
+        if ((R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation) and self.particle_locations["air"]==0 and self.particle_locations["glass"]!=0):
             self.done = True
-            #if (self.particle_locations["glas"]==0):
+            #if (self.particle_locations["glass"]==0):
             #    punish += 500
             # else:
             #     punish -= 50
@@ -243,7 +351,7 @@ class Pouring_base(gym.Env):
         bottle_radians = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
         if bottle_radians + rot_radians*self.steps_per_action > math.pi:
             rot_radians = 0
-        tt,rr = self.glas.check_if_in_rect(self.bottle,to_translate*self.steps_per_action,rot_radians*self.steps_per_action)
+        tt,rr = self.glass.check_if_in_rect(self.bottle,to_translate*self.steps_per_action,rot_radians*self.steps_per_action)
         to_translate = tt/self.steps_per_action
         rot_radians = rr/self.steps_per_action
         to_rotate = R.from_euler("z",rot_radians).as_matrix()
@@ -259,18 +367,21 @@ class Pouring_base(gym.Env):
         observation = self._observe()
         return observation,reward,self.done,{}
 
+
     def render(self, mode='human'):
+        """Render the environment using a gui window.
+        Args:
+            mode: Does nothing but exists for compatibility with gym.
+        Raises:
+            RuntimeError: When the environment was not initialized or reset with use_gui=True
+        """
         if self.gui is None:
-            raise Exception("Trying to render without initializing with gui_mode=True")
+            raise RuntimeError("Trying to render without initializing with use_gui=True")
         self.gui.one_render()
 
+
+    @abstractmethod
     def _observe(self):
-        raise NotImplementedError("Observation not implemented")
-
-if __name__ == "__main__":
-    env = Pouring_env(gui_mode=True)
-    for _ in range(1000):
-        obs,reward,done,info = env._step((0,0.5,0.5,0))
-        env._render()
-        print(obs,reward,done,info)
-
+        """Observe the current state of the environment.
+        """
+        pass

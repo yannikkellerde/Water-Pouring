@@ -15,20 +15,16 @@ WORKDIR /usr/src/bachelorthesis
 COPY requirements.txt .
 COPY water-pouring ./water-pouring
 RUN git clone git://github.com/yannikkellerde/SPlisHSPlasH.git
-RUN git clone git://github.com/yannikkellerde/TD3.git
-RUN git clone git://github.com/yannikkellerde/spinningup.git
 RUN python3.7 -m pip install -r requirements.txt
 RUN python3.7 -m pip install -e water-pouring/
 RUN python3.7 -m pip install SPlisHSPlasH/
 
 # Make partio work
 RUN python3.7 -c "import os;os.makedirs('/root/.local/lib/python3.7/site-packages/',exist_ok=True)"
-RUN echo "export OMP_NUM_THREADS=8" >> /root/.bashrc
 COPY docker_stuff/site-packages/ /root/.local/lib/python3.7/site-packages/
 COPY docker_stuff/libpartio.so /usr/local/lib/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
 ENV OMP_NUM_THREADS=8
 
 #Run the program
-WORKDIR /usr/src/bachelorthesis/TD3
-CMD python3.7 main.py --env water_pouring:Pouring-mdp-v0 --seed 100 --start_temperature 1 --time_step_punish 0.01 --load_model models/base_working/ --folder_name models/time_step_punish_0-01 --start_timesteps 100000
+WORKDIR /usr/src/bachelorthesis/

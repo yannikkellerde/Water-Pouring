@@ -2,6 +2,13 @@ import partio,sys,os
 import numpy as np
 
 def partio_uncompress(dirname):
+    """Take a folder of compressed .bgeo files and uncompress those files.
+    This can come in handy because SPlisHSPlasH stores it's particle data
+    as compressed .bgeo files.
+
+    Args:
+        dirname: Path to a directory of .bgeo files.
+    """
     for f in os.listdir(dirname):
         if not f.endswith(".bgeo"):
             continue
@@ -9,6 +16,12 @@ def partio_uncompress(dirname):
         partio.write(os.path.join(dirname,f),p)
 
 def partio_write_rigid_body(vertices,filename):
+    """Write vertices of an object into a .bgeo file.
+
+    Args:
+        vertices: A num_vertices x 3 numpy array.
+        filename: Path to the .bgeo file to create.
+    """
     os.makedirs(os.path.dirname(filename),exist_ok=True)
     particleSet=partio.create()
     P=particleSet.addAttribute("position",partio.VECTOR,3)
@@ -19,6 +32,14 @@ def partio_write_rigid_body(vertices,filename):
     partio.write(filename,particleSet)
 
 def remove_particles(infile,outfile,keep_rate):
+    """Remove a percentage of particles from a .bgeo file.
+
+    Args:
+        infile: Path to input .bgeo file.
+        outfile: The file where the reduced number of particles will be stored.
+        keep_rate: A float between 0 and 1 that describes how much percentage of
+                   particles will be kept in the new file.
+    """
     particles = partio.read(infile)
     orig_attr = particles.attributeInfo("position")
     orig_num_p = particles.numParticles()
@@ -35,30 +56,9 @@ def remove_particles(infile,outfile,keep_rate):
     partio.write(outfile,new_particles)
 
 def count_particles(filename):
+    """Count the number of particles in a .bgeo file.
+    """
     return partio.read(filename).numParticles()
-
-def evaluate_partio(dirname):
-    files = os.listdir(dirname)
-    files.sort(key=lambda x:-int(x.split(".")[0].split("_")[-1]))
-    filename = os.path.join(dirname,files[0])
-    particles = partio.read(filename)
-    pos_attr = particles.attributeInfo(0)
-
-    res = {
-        "spilled":0,
-        "bottle":0,
-        "glas":0,
-        "frames":len(files)
-    }
-    for i in range(particles.numParticles()):
-        pos = particles.get(pos_attr,i)
-        if pos[1]<0:
-            res["spilled"]+=1
-        elif abs(pos[0])<0.3 and abs(pos[2])<0.3 and pos[1]<0.6:
-            res["glas"]+=1
-        else:
-            res["bottle"]+=1
-    return res
 
 if __name__=="__main__":
     #print(evaluate_partio("../partio"))
