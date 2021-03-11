@@ -55,29 +55,29 @@ class Pouring_fixation(Pouring_featured):
         do not describe the full state completely.
 
         Returns:
-            A 10 or 16 dimensional numpy array that contains:
+            A 11 or 17 dimensional numpy array that contains:
                 1. Bottle Rotation
                 2. The x-translation of the bottle
                 3. The y-translation of the bottle
                 4. This episodes time_step_punish
                 5. This episodes spill_punish
                 6. This episodes target_fill_state
-                7. The fill-level of the glass
-                8. The amount of water in the air between bottle and glass.
-                9. The current fixation (fill-level or particles in air).
-                10-12. If self.jerk_punish > 0, the last performed action.
-                13-15. If self.jerk_punish > 0, the next to last performed action
+                7. The number of steps that have been performed since the start of the episode.
+                8. The fill-level of the glass
+                9. The amount of water in the bottle.
+                10. The amount of water in the air between bottle and glass.
+                11. The amount of spilled particles.
+                12. The current fixation (fill-level or particles in air).
+                13-15. If self.jerk_punish > 0, the last performed action.
+                16-18.  If self.jerk_punish > 0, the next to last performed action
             
             All values in the array are normalized to the range -1 to 1.
         """
         feat_dat = super(Pouring_fixation,self)._observe()
-        feat_dat = list(feat_dat)
-        del feat_dat[10]
-        del feat_dat[8]
-        del feat_dat[6]
-        if self.cur_fixation != -1:
-            feat_dat[6] = 0
-        if self.cur_fixation != 1:
+        if self.cur_fixation == 1:
             feat_dat[7] = 0
-        feat_dat.insert(8,self.cur_fixation)
+        else:
+            feat_dat[9] = 0
+        feat_dat = list(feat_dat)
+        feat_dat.insert(11,self.cur_fixation)
         return np.array(feat_dat)

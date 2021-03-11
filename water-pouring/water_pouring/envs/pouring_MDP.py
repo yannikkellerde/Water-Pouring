@@ -72,6 +72,7 @@ class Pouring_MDP(Pouring_base):
         translation_y = (translation_y - self.translation_bounds[1][0]) / (self.translation_bounds[1][1]-self.translation_bounds[1][0])
 
         for i in range(self.fluid.numActiveParticles()):
+            # Iterate above all fluid particles in the simulator and get their position/velocity
             pos = self.fluid.getPosition(i)
             vel = self.fluid.getVelocity(i)
             fluid_data.append((pos[0],pos[1],pos[2],vel[0],vel[1],vel[2],rotation,translation_x,translation_y))

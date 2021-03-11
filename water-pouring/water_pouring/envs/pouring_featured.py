@@ -69,6 +69,7 @@ class Pouring_featured(Pouring_base):
         feat_dat.append((self.particle_locations["air"]/self.max_in_air)*2-1)
         feat_dat.append((self.particle_locations["spilled"]/self.max_spill)*2-1)
         if self.jerk_punish>0:
+            # Extend the observation with the actions from the two last steps.
             feat_dat.extend(np.array(self.last_actions)[:-1].flatten())
         feat_dat = np.clip(np.array(feat_dat),-1,1)
         return feat_dat

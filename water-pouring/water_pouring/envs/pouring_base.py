@@ -142,6 +142,7 @@ class Pouring_base(ABC,gym.Env):
             seed: An integer seed for the random number generator.
         """
         np.random.seed(seed)
+        random.seed(seed)
 
 
     def reset(self,first=False,use_gui=False,printstate=False):
@@ -158,9 +159,9 @@ class Pouring_base(ABC,gym.Env):
             The state of the environment after resetting
         """
         if not first:
-            self.base.cleanup()
+            self.base.cleanup() # Reset the fluid simulator to prevent Segfaults.
         if self.gui is not None:
-            self.gui.die()
+            self.gui.die() # Remove th old gui window.
         self.gui = None
         if use_gui:
             self.use_gui = use_gui
@@ -175,10 +176,12 @@ class Pouring_base(ABC,gym.Env):
         self.base.initSimulation()
         self.base.initBoundaryData()
 
+        # Initialize Model3d api to rigid bodies from the fluid simulator.
         self.bottle = Model3d(self.sim.getCurrent().getBoundaryModel(1).getRigidBodyObject())
         self.glass = Model3d(self.sim.getCurrent().getBoundaryModel(0).getRigidBodyObject(),stretch_vertices=0.1)
         self.fluid = self.sim.getCurrent().getFluidModel(0)
 
+        # Randomize parameters by sampling from their given range.
         if not self.fixed_tsp:
             self.time_step_punish = util.get_random(self.time_step_punish_range)
         if not self.fixed_spill:
@@ -186,7 +189,7 @@ class Pouring_base(ABC,gym.Env):
         if not self.fixed_target_fill:
             self.target_fill_state = util.get_random(self.target_fill_range)
 
-        if printstate:
+        if printstate: # Some usefull debug prints
             if not first:
                 print("In glass:",self.particle_locations["glass"])
                 print("Spilled:",self.particle_locations["spilled"])
@@ -343,7 +346,6 @@ class Pouring_base(ABC,gym.Env):
             to_translate[1] = 0
 
         # Episode end conditions
-
         # Bottle angle lowered below threshold
         if ((R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation) and self.particle_locations["air"]==0 and self.particle_locations["glass"]!=0):
             self.done = True
