@@ -92,7 +92,7 @@ class Pouring_base(ABC,gym.Env):
             scene_base: The scene file that will used to set the environment
         """
 
-        self.action_space = NotImplemented
+        self.action_space = spaces.Box(low=-1,high=1,shape=(3,))
         self.observation_space = NotImplemented
 
         # Actions and Movement
