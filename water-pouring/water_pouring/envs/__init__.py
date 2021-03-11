@@ -3,3 +3,4 @@ from water_pouring.envs.pouring_MDP import Pouring_MDP
 from water_pouring.envs.pouring_featured import Pouring_featured
 from water_pouring.envs.pouring_G2G_featured import Pouring_G2G_featured
 from water_pouring.envs.pouring_G2G_MDP import Pouring_G2G_MDP
+from water_pouring.envs.pouring_fixation import Pouring_fixation

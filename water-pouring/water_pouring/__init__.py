@@ -20,3 +20,8 @@ register(
     entry_point='water_pouring.envs:Pouring_G2G_featured',
     nondeterministic = True
 )
+register(
+    id='Pouring-fixation-v0',
+    entry_point='water_pouring.envs:Pouring_fixation',
+    nondeterministic = True
+)

@@ -319,51 +319,59 @@ class Pouring_base(ABC,gym.Env):
             ValueError: If an invalid action was given as an argument.
         """
         action = np.array(action)
+
+        # Store performed action to potentially output as additional observations.
         self.last_actions.appendleft(action)
-        punish = 0
+
         if len(action)!=3 or np.any(action>1) or np.any(action<-1):
             raise ValueError("Invalid action {}".format(action))
-        if self.policy_uncertainty>0:
+
+        if self.policy_uncertainty>0:  # Add signal dependent noise
             action = np.random.normal(action,np.abs(action)*self.policy_uncertainty)
-        action = np.clip(action,-1,1)
         self._step_number += 1
+
+        # Tranlate performed action into actual performed rotation and translation.
         rot_radians = -action[0]*self.max_rotation_radians
         to_translate = self.base_translation_vector*np.array([action[1],action[2],0],dtype=np.float)
 
+        # Do not move the bottle out of translation bounds
         if (self.bottle.translation[0] + to_translate[0]*self.steps_per_action > self.translation_bounds[0][1] or
                 self.bottle.translation[0] + to_translate[0]*self.steps_per_action < self.translation_bounds[0][0]):
             to_translate[0] = 0
-        
         if (self.bottle.translation[1] + to_translate[1]*self.steps_per_action > self.translation_bounds[1][1] or
                 self.bottle.translation[1] + to_translate[1]*self.steps_per_action < self.translation_bounds[1][0]):
             to_translate[1] = 0
+
+        # Episode end conditions
+
+        # Bottle angle lowered below threshold
         if ((R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]<self.min_rotation) and self.particle_locations["air"]==0 and self.particle_locations["glass"]!=0):
             self.done = True
-            #if (self.particle_locations["glass"]==0):
-            #    punish += 500
-            # else:
-            #     punish -= 50
+
+        # Maximum number of steps reached
         if (self._step_number>self._max_episode_steps):
-            #punish += 100
             self.done = True
+
+        # Too many spilled partilces
         if (self.particle_locations["spilled"]>=self.max_spill):
             self.done = True
-        bottle_radians = R.from_matrix(self.bottle.rotation).as_euler("zyx")[0]
-        if bottle_radians + rot_radians*self.steps_per_action > math.pi:
-            rot_radians = 0
+
+        # Prevent bottle glass collision
         tt,rr = self.glass.check_if_in_rect(self.bottle,to_translate*self.steps_per_action,rot_radians*self.steps_per_action)
+
+        # Ajust rotation/translation magnitude for a single step in the fluid simulator
         to_translate = tt/self.steps_per_action
         rot_radians = rr/self.steps_per_action
+
         to_rotate = R.from_euler("z",rot_radians).as_matrix()
         for step in range(self.steps_per_action):
+            # Actually rotate and translate the bottle in the simulator
             self.bottle.rotate(to_rotate)
             self.bottle.translate(to_translate)
             self.time += self.time_step_size
-            self.base.timeStepNoGUI()
+            self.base.timeStepNoGUI() # Perform single time step in fluid simulator
         self.bottle.body.updateVertices()
-        old_particle_locations = self.particle_locations
         reward = self._get_reward()
-        reward-=punish
         observation = self._observe()
         return observation,reward,self.done,{}
 

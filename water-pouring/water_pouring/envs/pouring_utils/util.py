@@ -75,7 +75,7 @@ def extract_time_step_size(scene_file):
         data = json.load(f)
     return float(data["Configuration"]["timeStepSize"])
 
-def get_random(self,attr_range):
+def get_random(attr_range):
     """Get a random value in the specified range.
 
     Args:
