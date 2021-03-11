@@ -31,7 +31,7 @@ class Pouring_fixation(Pouring_featured):
             self.saccade_speed = 2
         else:
             self.saccade_speed = np.clip(((self.time_step_size*self.steps_per_action)/saccade_time)*2,-2,2)
-        self.observation_space = spaces.Box(low=-1,high=1,shape=(12+(2*self.action_space.shape[0] if self.jerk_punish>0 else 0),))
+        self.observation_space = spaces.Box(low=-1,high=1,shape=(9+(2*self.action_space.shape[0] if self.jerk_punish>0 else 0),))
 
     def reset(self,**kwargs):
         if len(self.fix_list)>0:
