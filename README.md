@@ -1,5 +1,8 @@
 # Water-pouring Gym environment
 
+![pour](graphics/gif/work_with.gif)
+![pour](graphics/gif/g2g.gif)
+
 This repository contains a water-pouring Reinforcement Learning environment implemented in OpenAI gym.
 
 ## Installation
@@ -20,4 +23,6 @@ Run `python human_player` to test the installation. In this test program, you ca
 **water_pouring:Pouring-mdp-v0** - Pour from a bottle into a glass while getting the full simulators state as observations.  
 **water_pouring:Pouring-featured-v0** - Pour from a bottle into a glass while getting handcrafted features as observations that do not fully describe the state of the simulator.  
 **water_pouring:Pouring-g2g-mdp-v0** - Pour from a glass into another glass while getting the full simulators state as observations.  
-**water_pouring:Pouring-featured-v0** - Pour from a glass into another glass while getting handcrafted features as observations.  
+**water_pouring:Pouring-g2g-featured-v0** - Pour from a glass into another glass while getting handcrafted features as observations.  
+
+![pour](graphics/gif/low-targ-fill.gif)
