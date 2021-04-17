@@ -12,7 +12,7 @@ Installation has been tested on a Ubuntu 18.04 machine. Other Debian based distr
 2. The following apt packages: cmake, build-essential, libx11-dev, xorg-dev, libglu1-mesa-dev, python3.7-dev, python3-setuptools
 3. The python packages in requirements.txt. I would recommend using a virtualenv.
 4. My SPlisHSPlasH fork on https://github.com/yannikkellerde/SPlisHSPlasH. Install by cloning the repo and running `pip install SPlisHSPlasH/`. Installation might take a few minutes.
-5. Partio's python bindings https://github.com/wdas/partio. Installation of the python bindings can be a little tricky. I would recommend just copying the libpartio.so libary that is provided in the [docker_stuff](docker_stuff/) folder in this repo to a location included in your LD_LIBRARY_PATH and copying the files from [docker_stuff/site_packages](docker_stuff/site_packages) to your virtualenv site-packages.
+5. Partio's python bindings https://github.com/wdas/partio. Installation of the python bindings can be a little tricky. I would recommend just copying the libpartio.so libary that is provided in the [docker_stuff](docker_stuff/) folder in this repo to a location included in your LD_LIBRARY_PATH and copying the files from [docker_stuff/site-packages](docker_stuff/site-packages) to your virtualenv site-packages.
 
 Now you can install the water-pouring environment with `pip install -e water-pouring/` from this repositories root.
 
